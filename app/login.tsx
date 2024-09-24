@@ -1,6 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { UserContext } from '../contexts/UserContext';
+import toastHelper from '@/utils/toast';
+import Toast from 'react-native-toast-message';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -25,6 +27,7 @@ export default function LoginScreen() {
         />
         <Button title="Entrar" onPress={handleLogin} color="#44EAC3" />
       </View>
+
     </TouchableWithoutFeedback>
   );
 }

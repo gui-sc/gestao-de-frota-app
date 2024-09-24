@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, FlatList, Alert, SafeAreaView } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
-
+import toastHelper from '@/utils/toast';
+import Toast from 'react-native-toast-message';
 export default function HomeScreen() {
   const { user, logout } = useContext(UserContext);
 
@@ -18,35 +19,35 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-    <View style={styles.container}>
-      <Text style={styles.header}>Olá, {user ? user.username : "undefined"}!</Text>
+      <View style={styles.container}>
+        <Text style={styles.header}>Olá, {user ? user.username : "undefined"}!</Text>
 
-      <Text style={styles.sectionTitle}>Últimas Viagens</Text>
-      <FlatList
-        data={viagens}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.itemText}>{item.destino}</Text>
-            <Text style={styles.itemText}>{item.data}</Text>
-          </View>
-        )}
-      />
+        <Text style={styles.sectionTitle}>Últimas Viagens</Text>
+        <FlatList
+          data={viagens}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.item}>
+              <Text style={styles.itemText}>{item.destino}</Text>
+              <Text style={styles.itemText}>{item.data}</Text>
+            </View>
+          )}
+        />
 
-      <Text style={styles.sectionTitle}>Datas Importantes</Text>
-      <FlatList
-        data={datasImportantes}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.itemText}>{item.evento}</Text>
-            <Text style={styles.itemText}>{item.data}</Text>
-          </View>
-        )}
-      />
+        <Text style={styles.sectionTitle}>Datas Importantes</Text>
+        <FlatList
+          data={datasImportantes}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.item}>
+              <Text style={styles.itemText}>{item.evento}</Text>
+              <Text style={styles.itemText}>{item.data}</Text>
+            </View>
+          )}
+        />
 
-      <Button title="Logout" onPress={logout} color="#44EAC3" />
-    </View>
+        <Button title="Logout" onPress={logout} color="#44EAC3" />
+      </View>
     </SafeAreaView>
   );
 }

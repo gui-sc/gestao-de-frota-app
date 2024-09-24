@@ -34,11 +34,11 @@ export default function TabLayout() {
       />
       
       <Tabs.Screen
-        name="settings"
+        name="trips"
         options={{
-          title: 'settings',
+          title: 'Viagens',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'settings-sharp' : 'settings-outline'} color={color} />
+            <TabBarIcon name={focused ? 'car' : 'car-outline'} color={color} />
           ),
         }}
       />
