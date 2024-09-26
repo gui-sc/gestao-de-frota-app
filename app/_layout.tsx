@@ -36,9 +36,13 @@ export default function RootLayout() {
       <UserProvider>
         <Stack screenOptions={{ headerShown: false }}>
           {user ?
+          <>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="chat" options={{ headerShown: false }}/>
+          </>
             :
-            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="login"
+            options={{ headerShown: false }} />
           }
           <Stack.Screen name="+not-found" />
         </Stack>
