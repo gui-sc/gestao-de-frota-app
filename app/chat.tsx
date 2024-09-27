@@ -1,31 +1,34 @@
 import React from 'react';
 import { View, Text, TextInput, Button, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface Message {
     id: string;
     text: string;
     sender: string;
+    timestamp: number;
 }
 
 type ChatScreenRouteProp = RouteProp<{ chat: { passengerName: string; passengerPhoto: string } }>
 
 export default function ChatScreen() {
-    const route = useRoute<ChatScreenRouteProp>()
+    const route = useRoute<ChatScreenRouteProp>();
     const { passengerName, passengerPhoto } = route.params;
 
     const [messages, setMessages] = React.useState<Message[]>([
-        { id: '2', text: 'Pode me buscar em 10 minutos?', sender: passengerName },
+        { id: '2', text: 'Pode me buscar em 10 minutos?', sender: passengerName, timestamp: new Date().getTime() },
     ]);
     const [newMessage, setNewMessage] = React.useState('');
 
     const sendMessage = () => {
         if (newMessage.trim()) {
             setMessages([
+                { id: (Date.now() + 1).toString(), text: "Ok", sender: passengerName, timestamp: new Date().getTime() },
+                { id: Date.now().toString(), text: newMessage, sender: 'Você', timestamp: new Date().getTime() },
                 ...messages,
-                { id: Date.now().toString(), text: newMessage, sender: 'Você' },
-                { id: (Date.now() + 1).toString(), text: "Ok", sender: passengerName }]);
-            setNewMessage(''); // Limpar o campo de entrada
+            ]);
+            setNewMessage('');
         }
     };
 
@@ -43,13 +46,18 @@ export default function ChatScreen() {
 
                 <FlatList
                     data={messages}
+                    inverted // Para começar pela última mensagem
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                         <View style={item.sender === 'Você' ? styles.myMessage : styles.theirMessage}>
                             <Text style={item.sender === 'Você' ? styles.myMessageText : styles.theirMessageText}>{item.text}</Text>
+                            <Text style={item.sender === "Você" ? styles.myMessageTime : styles.theirMessageTime}>
+                                {dayjs(item.timestamp).format('HH:mm')}
+                            </Text>
                         </View>
                     )}
                     style={styles.messagesList}
+                    keyboardShouldPersistTaps="handled" // Para garantir a interação correta com o teclado
                 />
 
                 <View style={styles.inputContainer}>
@@ -59,6 +67,7 @@ export default function ChatScreen() {
                         style={styles.input}
                         placeholder="Digite sua mensagem"
                         placeholderTextColor="#ccc"
+                        multiline // Permitir quebra de linha // Limitar o crescimento do input
                     />
                     <TouchableOpacity onPress={sendMessage} style={styles.button}>
                         <Text style={styles.buttonText}>Enviar</Text>
@@ -92,6 +101,7 @@ const styles = StyleSheet.create({
     },
     messagesList: {
         flex: 1,
+        paddingEnd: 8
     },
     myMessage: {
         alignSelf: 'flex-end',
@@ -113,9 +123,11 @@ const styles = StyleSheet.create({
     },
     myMessageText: {
         color: '#000',
+        textAlign: 'left',
     },
     theirMessageText: {
         color: '#fff',
+        textAlign: 'left',
     },
     inputContainer: {
         flexDirection: 'row',
@@ -128,6 +140,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 10,
         marginRight: 10,
+        maxHeight: 100,
     },
     button: {
         backgroundColor: '#44EAC3',
@@ -137,5 +150,17 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#000',
         fontWeight: 'bold',
-    }
+    },
+    theirMessageTime: {
+        color: '#ccc',
+        fontSize: 12,
+        marginTop: 5,
+        alignSelf: 'flex-end',
+    },
+    myMessageTime: {
+        color: '#000',
+        fontSize: 12,
+        marginTop: 5,
+        alignSelf: 'flex-start',
+    },
 });
