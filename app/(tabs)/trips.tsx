@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
 import TripDetailsModal from '../../components/TripDetailsModal'; // Importando o modal
 import { Trip } from '@/types/trip';
 
 export default function HomeScreen() {
-  const { user, logout } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
   const trips = [
@@ -52,8 +52,6 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.header}>Olá, {user ? user.username : "Motorista"}!</Text>
-
         <Text style={styles.sectionTitle}>Viagens Solicitadas</Text>
         <FlatList
           data={trips}
@@ -74,9 +72,6 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
         />
-
-
-        <Button title="Logout" onPress={logout} color="#44EAC3" />
 
         {/* Modal com detalhes da viagem */}
         {selectedTrip && <TripDetailsModal visible={!!selectedTrip} trip={selectedTrip} onClose={closeModal} />}

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Keyboard, Image } from 'react-native';
 import { UserContext } from '../contexts/UserContext';
 import toastHelper from '@/utils/toast';
 import Toast from 'react-native-toast-message';
@@ -8,22 +8,48 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { login } = useContext(UserContext);
+  const { login, user } = useContext(UserContext);
 
   const handleLogin = () => {
-    login({ username: email.split("@")[0], email });
+    login({
+      username: email.split("@")[0],
+      email,
+      fullName: email.split("@")[0],
+      birthDate: '1990-07-01T14:20:00Z',
+      cpf: '12345678900',
+      carModel: 'Civic',
+      licensePlate: 'ABC1234',
+      photo: 'https://randomuser.me/api/portraits/men/1.jpg',
+    });
   };
+
+  if(user) {
+    toastHelper.success('Login realizado com sucesso!', 'success');
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
+        <Image source={require('../assets/images/dc_logo.png')} 
+        style={styles.photo} 
+        resizeMode='contain'/>
         <TextInput
-          style={styles.input}
-          placeholder="Digite seu nome"
+          style={[styles.input, {
+            marginTop: 50
+          }]}
+          placeholder="Digite seu e-mail"
           placeholderTextColor="#ccc"
           value={email}
           onChangeText={setEmail}
+        />
+        {/* password input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Digite sua senha"
+          placeholderTextColor="#ccc"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
         />
         <Button title="Entrar" onPress={handleLogin} color="#44EAC3" />
       </View>
@@ -51,5 +77,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     color: '#fff',
+  },
+  photo: {
+    width: 150,
+    height: 150,
+    alignSelf: 'center',
   },
 });

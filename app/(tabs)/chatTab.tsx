@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, SafeAreaView } from 'react-native';
 import UnreadBadge from '../../components/UnreadBadge';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { useNavigation } from 'expo-router';
 import { RouteList } from '../../utils/stackParamRouteList';
 
@@ -49,7 +49,7 @@ export default function ChatTabScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.header}>Chat com Passageiros</Text>
+        <Text style={styles.header}>Conversas</Text>
         <FlatList
           data={chats}
           keyExtractor={(item) => item.id}

@@ -1,104 +1,61 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Text, TextInput, Button, StyleSheet, Alert, SafeAreaView, ScrollView } from 'react-native';
+import { Text, View, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
-import InputPicture from '@/components/InputPicture';
-import { maskToCpf, maskToDate } from '@/utils/mask';
-import toast from '../../utils/toast'
+import { maskToCpf } from '@/utils/mask';
+import toast from '../../utils/toast';
+import InputPicture from '../../components/InputPicture';
+import dayjs from 'dayjs';
 
 export default function TabFourScreen() {
-    const { user } = useContext(UserContext);
-    const [nomeCompleto, setNomeCompleto] = useState('');
-    const [dataNascimento, setDataNascimento] = useState('');
-    const [email, setEmail] = useState('')
-    const [cpf, setCpf] = useState('');
-    const [foto, setFoto] = useState<string | null>(null);
-    const [cnh, setCnh] = useState<string | null>(null);
-    const [identidade, setIdentidade] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (user) {
-            // Simulação de chamada à API para buscar os dados do usuário
-            const fetchUserData = async () => {
-                // Aqui você deve substituir pela chamada real à sua API
-                const response = await fetch(`https://api.exemplo.com/users/${user.username}`);
-                const data = await response.json();
-                setNomeCompleto(data.nomeCompleto);
-                setDataNascimento(data.dataNascimento);
-                setCpf(data.cpf);
-                setFoto(data.foto);
-            };
-
-            fetchUserData();
-        }
-    }, [user]);
-
-
-    const handleSave = async () => {
-        // Simulação de chamada à API para salvar os dados alterados
-        try {
-            if (user) {
-                const response = await fetch(`https://api.exemplo.com/users/${user.username}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        nomeCompleto,
-                        dataNascimento,
-                        cpf,
-                        foto,
-                    }),
-                });
-
-                if (response.ok) {
-                    toast.success('Sucesso', 'Informações salvas com sucesso!');
-                } else {
-                    throw new Error('Erro ao salvar informações.');
-                }
-            }
-        } catch (error: any) {
-            toast.error('Erro', error.message);
-        }
-    };
+    const { user, logout } = useContext(UserContext);
+    const [dataNascimento, setDataNascimento] = useState<dayjs.Dayjs | null>(dayjs(user?.birthDate ?? '1990-07-01T14:20:00Z'));
+    const [foto, setFoto] = useState<string>(user?.photo || 'https://randomuser.me/api/portraits/men/1.jpg');
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.container}>
-                <Text style={styles.header}>Perfil do Usuário</Text>
+                <View style={styles.headerContainer}>
+                    <Image
+                        source={{ uri: foto }}
+                        style={styles.image}
+                        resizeMode='contain'
+                    />
+                    <Text style={styles.header}>{user?.fullName}</Text>
+                </View>
 
-                <TextInput
-                    style={styles.input}
-                    placeholder="Nome Completo"
-                    value={nomeCompleto}
-                    onChangeText={setNomeCompleto}
-                />
-                <TextInput
-                    style={styles.input}
-                    inputMode='numeric'
-                    placeholder="Data de Nascimento (DD/MM/AAAA)"
-                    value={dataNascimento}
-                    onChangeText={(e) => { setDataNascimento(maskToDate(e)) }}
-                />
-                <TextInput
-                    style={styles.input}
-                    inputMode='numeric'
-                    placeholder="CPF"
-                    value={cpf}
-                    onChangeText={(e) => { setCpf(maskToCpf(e)) }}
-                />
+                <View style={styles.infoContainer}>
+                    <Text style={styles.label}>Nome Completo</Text>
+                    <Text style={styles.info}>{user?.fullName}</Text>
+                </View>
 
-                <TextInput
-                    style={styles.input}
-                    inputMode='email'
-                    placeholder="E-mail"
-                    value={email}
-                    onChangeText={setEmail}
-                />
+                <View style={styles.infoContainer}>
+                    <Text style={styles.label}>Data de Nascimento</Text>
+                    <Text style={styles.info}>{dataNascimento?.format("DD/MM/YYYY")}</Text>
+                </View>
 
-                <InputPicture label="CNH" onChange={setCnh} />
-                <InputPicture label="Identidade" onChange={setIdentidade} />
+                <View style={styles.infoContainer}>
+                    <Text style={styles.label}>CPF</Text>
+                    <Text style={styles.info}>{maskToCpf(user?.cpf || '')}</Text>
+                </View>
 
-                <Button title="Salvar" onPress={handleSave} color="#44EAC3" />
+                <View style={styles.infoContainer}>
+                    <Text style={styles.label}>E-mail</Text>
+                    <Text style={styles.info}>{user?.email}</Text>
+                </View>
+
+                <View style={styles.infoContainer}>
+                    <Text style={styles.label}>Carro</Text>
+                    <Text style={styles.info}>{user?.carModel}</Text>
+                </View>
+
+                <View style={styles.infoContainer}>
+                    <Text style={styles.label}>Placa</Text>
+                    <Text style={styles.info}>{user?.licensePlate}</Text>
+                </View>
+                <InputPicture showFile={false} onChange={setFoto} />
+                <TouchableOpacity onPress={logout} style={styles.button}>
+                    <Text style={styles.buttonText}>Sair</Text>
+                </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>
     );
@@ -115,17 +72,45 @@ const styles = StyleSheet.create({
         color: '#44EAC3',
         marginBottom: 20,
     },
-    input: {
-        height: 40,
-        borderColor: '#44EAC3',
-        borderWidth: 1,
-        marginBottom: 15,
-        paddingHorizontal: 10,
-        color: '#fff',
-    },
     image: {
-        width: 100,
-        height: 100,
-        marginVertical: 15,
+        width: 50,
+        height: 50,
+        borderRadius: 50,
+        alignSelf: 'center',
+        marginBottom: 10,
     },
+    changePhotoText: {
+        color: '#44EAC3',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    infoContainer: {
+        marginBottom: 15,
+    },
+    label: {
+        color: '#44EAC3',
+        fontSize: 16,
+    },
+    info: {
+        color: '#fff',
+        fontSize: 18,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginBottom: 20,
+    },
+    button: {
+        backgroundColor: '#44EAC3',
+        padding: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+        alignSelf: 'center',
+        width: '30%',
+    },
+    buttonText: {
+        color: '#000',
+        fontWeight: 'bold',
+    }
 });

@@ -1,11 +1,9 @@
-import React, { useContext, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, FlatList, Alert, SafeAreaView } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
-import toastHelper from '@/utils/toast';
-import Toast from 'react-native-toast-message';
 export default function HomeScreen() {
-  const { user, logout } = useContext(UserContext);
-
+  const { user } = useContext(UserContext);
+  
   const viagens = [
     { id: '1', destino: 'Rio de Janeiro', data: '12/09/2024' },
     { id: '2', destino: 'São Paulo', data: '08/09/2024' },
@@ -46,7 +44,6 @@ export default function HomeScreen() {
           )}
         />
 
-        <Button title="Logout" onPress={logout} color="#44EAC3" />
       </View>
     </SafeAreaView>
   );

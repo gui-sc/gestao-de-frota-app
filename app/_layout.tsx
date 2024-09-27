@@ -4,22 +4,19 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useContext, useEffect } from 'react';
 import 'react-native-reanimated';
-
-// import { Toast } from 'react-native-toast-message';
-
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { UserContext, UserProvider } from '../contexts/UserContext';
+import { UserProvider, UserContext } from '../contexts/UserContext'; // Importa UserContext
 import Toast from 'react-native-toast-message';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const { user } = useContext(UserContext);
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  const { user } = useContext(UserContext); // Pega o estado do usuário
 
   useEffect(() => {
     if (loaded) {
@@ -31,22 +28,20 @@ export default function RootLayout() {
     return null;
   }
 
+  // Verifica se o usuário está logado e define a rota inicial com base nisso
+  const initialRoute = user ? '(tabs)' : 'login';  // Se tiver user, manda para tabs, senão para login
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <UserProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          {user ?
-          <>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="chat" options={{ headerShown: false }}/>
-          </>
-            :
-            <Stack.Screen name="login"
+        <Stack screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
+          <Stack.Screen name="login"
             options={{ headerShown: false }} />
-          }
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="chat" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <Toast/>
+        <Toast />
       </UserProvider>
     </ThemeProvider>
   );

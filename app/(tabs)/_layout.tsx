@@ -7,7 +7,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
+  
   return (
     <Tabs
       screenOptions={{
@@ -17,7 +17,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Início',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'home-sharp' : 'home-outline'} color={color} />
           ),
@@ -26,13 +26,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chatTab"
         options={{
-          title: 'Chat',
+          title: 'Conversas',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'chatbubble' : 'chatbubble-outline'} color={color} />
           ),
         }}
       />
-      
+
       <Tabs.Screen
         name="trips"
         options={{
@@ -45,7 +45,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: 'Perfil',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
           ),

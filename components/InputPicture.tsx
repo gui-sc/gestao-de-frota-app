@@ -1,8 +1,9 @@
 import { useState } from "react";
 import * as ImagePicker from 'expo-image-picker'
 import { View, Button, Text, Image, StyleSheet } from "react-native";
-const InputPicture = ({ label, onChange }: {
-    label: string,
+const InputPicture = ({ label, showFile = true, onChange }: {
+    label?: string,
+    showFile?: boolean,
     onChange: (uri: string) => void
 }) => {
     const [foto, setFoto] = useState<string | null>(null);
@@ -24,7 +25,7 @@ const InputPicture = ({ label, onChange }: {
     return (
         <View style={styles.documentUploader}>
             <Text style={styles.label}>{label}</Text>
-            {foto && <Image source={{ uri: foto }} style={styles.image} />}
+            {(foto && showFile) && <Image source={{ uri: foto }} style={styles.image} />}
             <Button title="Escolher Foto" onPress={handleImagePicker} color={'#44EAC3'} />
         </View>
     );

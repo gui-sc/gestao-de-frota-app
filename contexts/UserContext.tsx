@@ -5,6 +5,12 @@ import { RouteList } from '../utils/stackParamRouteList';
 type User = {
     username: string;
     email: string;
+    fullName: string;
+    photo?: string;
+    birthDate: string;
+    cpf: string;
+    carModel: string;
+    licensePlate: string;
 };
 
 
