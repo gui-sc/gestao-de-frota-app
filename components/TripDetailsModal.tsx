@@ -3,7 +3,8 @@ import { useNavigation } from 'expo-router';
 import React, { useEffect } from 'react';
 import { View, Text, Button, Modal, StyleSheet, Image } from 'react-native';
 import { RouteList } from '../utils/stackParamRouteList';
-const API_KEY = '';
+import { API_KEY } from '../constants/Env';
+
 const TripDetailsModal = ({
     visible,
     trip,

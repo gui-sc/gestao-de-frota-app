@@ -6,8 +6,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import MapViewDirections from 'react-native-maps-directions';
 import { UserContext } from '../contexts/UserContext';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-
-const API_KEY = ''
+import { API_KEY } from '../constants/Env';
 
 type MapScreenRouteProp = RouteProp<{
     map: {
