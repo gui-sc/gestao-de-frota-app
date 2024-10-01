@@ -43,10 +43,6 @@ const MapScreen = () => {
     const [intervalId, setIntervalId] = useState<NodeJS.Timer | null>(null);
 
     useEffect(() => {
-        getCurrentLocation();
-    }, []);
-
-    useEffect(() => {
         if (isTripStarted) {
             const id = setInterval(() => {
                 setTripTime(prev => prev + 1);  // Incrementa o tempo da viagem a cada segundo

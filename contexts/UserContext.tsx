@@ -3,6 +3,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { createContext, useState } from 'react';
 import { RouteList } from '../utils/stackParamRouteList';
 type User = {
+    type: 'Driver';
     username: string;
     email: string;
     fullName: string;
@@ -11,6 +12,14 @@ type User = {
     cpf: string;
     carModel: string;
     licensePlate: string;
+} | {
+    type: 'Passenger';
+    username: string;
+    email: string;
+    fullName: string;
+    photo?: string;
+    birthDate: string;
+    cpf: string;
 };
 
 
@@ -34,7 +43,8 @@ export const UserProvider = ({ children }: {
     // Função para logar o  usuário
     const login = (userData: User) => {
         setUser(userData);
-        navigation.navigate('index');
+        if(userData.type == 'Driver') navigation.navigate('driver');
+        if(userData.type == 'Passenger') navigation.navigate('passenger')
     };
 
     // Função para deslogar o usuário

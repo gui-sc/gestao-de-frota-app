@@ -11,16 +11,31 @@ export default function LoginScreen() {
   const { login, user } = useContext(UserContext);
 
   const handleLogin = () => {
-    login({
-      username: email.split("@")[0],
-      email,
-      fullName: email.split("@")[0],
-      birthDate: '1990-07-01T14:20:00Z',
-      cpf: '12345678900',
-      carModel: 'Civic',
-      licensePlate: 'ABC1234',
-      photo: 'https://randomuser.me/api/portraits/men/1.jpg',
-    });
+    if(email.split("@")[0].toLowerCase() == 'driver'){
+      login({
+        type: 'Driver',
+        username: email.split("@")[0],
+        email,
+        fullName: email.split("@")[0],
+        birthDate: '1990-07-01T14:20:00Z',
+        cpf: '12345678900',
+        carModel: 'Civic',
+        licensePlate: 'ABC1234',
+        photo: 'https://randomuser.me/api/portraits/men/1.jpg',
+      });
+
+    }else{
+      console.log('logando passenger')
+      login({
+        type: 'Passenger',
+        username: email.split("@")[0],
+        email,
+        fullName: email.split("@")[0],
+        birthDate: '1990-07-01T14:20:00Z',
+        cpf: '12345678900',
+        photo: 'https://randomuser.me/api/portraits/men/1.jpg',
+      })
+    }
   };
 
   if(user) {

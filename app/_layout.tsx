@@ -28,16 +28,17 @@ export default function RootLayout() {
     return null;
   }
 
-  // Verifica se o usuário está logado e define a rota inicial com base nisso
-  const initialRoute = user ? '(tabs)' : 'login';  // Se tiver user, manda para tabs, senão para login
-
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <UserProvider>
-        <Stack screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
+        <Stack screenOptions={{ headerShown: false }} initialRouteName={'login'}>
           <Stack.Screen name="login"
             options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          {user?.type === 'Driver' ? (
+            <Stack.Screen name="driver" options={{ headerShown: false }} />
+          ) : (
+            <Stack.Screen name="passenger" options={{ headerShown: false }} />
+          )}
           <Stack.Screen name="chat" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
