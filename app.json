@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "gestao-frota-app",
-    "slug": "gestao-frota-app",
+    "slug": "gestaofrota",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +41,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f5ed3e83-9052-48f4-97b6-058b6051c822"
+      }
+    },
+    "owner": "guisc"
   }
 }
