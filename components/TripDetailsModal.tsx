@@ -1,7 +1,9 @@
 import { Trip } from '@/types/trip';
+import { useNavigation } from 'expo-router';
 import React, { useEffect } from 'react';
 import { View, Text, Button, Modal, StyleSheet, Image } from 'react-native';
-
+import { RouteList } from '../utils/stackParamRouteList';
+const API_KEY = '';
 const TripDetailsModal = ({
     visible,
     trip,
@@ -11,8 +13,20 @@ const TripDetailsModal = ({
     trip: Trip | null,
     onClose: () => void
 }) => {
+    const navigation = useNavigation<RouteList>();
     if (!trip) return null;
 
+    const handleAcceptTrip = () => {
+        navigation.navigate('map', {
+            pickupCoordinates: trip.pickupCoordinates,
+            destinationCoordinates: trip.dropoffCoordinates,
+            user: {
+                name: trip.passengerName,
+                photo: trip.passengerPhoto,
+            },
+        });
+        onClose();
+    }
     return (
         <Modal
             animationType="slide"
@@ -35,11 +49,11 @@ const TripDetailsModal = ({
 
                     {/* Mapa (substitua pelo URI do mapa correspondente) */}
                     <Image
-                        source={{ uri: `https://maps.googleapis.com/maps/api/staticmap?center=${trip.pickupCoordinates.latitude},${trip.pickupCoordinates.longitude}&zoom=14&size=400x200&markers=color:red%7Clabel:P%7C${trip.pickupCoordinates.latitude},${trip.pickupCoordinates.longitude}&key=${process.env.API_KEY}` }}
+                        source={{ uri: `https://maps.googleapis.com/maps/api/staticmap?center=${trip.pickupCoordinates.latitude},${trip.pickupCoordinates.longitude}&zoom=14&size=400x200&markers=color:red%7Clabel:P%7C${trip.pickupCoordinates.latitude},${trip.pickupCoordinates.longitude}&key=${API_KEY}` }}
                         style={styles.mapImage}
                     />
 
-                    <Button title="Aceitar Viagem" onPress={onClose} color="#44EAC3" />
+                    <Button title="Aceitar Viagem" onPress={handleAcceptTrip} color="#44EAC3" />
                     <Button title="Fechar" onPress={onClose} color="#FF0000" />
                 </View>
             </View>
