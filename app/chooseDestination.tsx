@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Alert, StyleSheet, View, Text, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, TextInput, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
-import { UserContext } from '../contexts/UserContext';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { API_KEY } from '../constants/Env';
 import MapViewDirections from 'react-native-maps-directions';
 
 const chooseDestination = () => {
-    const { user } = useContext(UserContext);
     const [location, setLocation] = useState<{
         latitude: number;
         longitude: number;
