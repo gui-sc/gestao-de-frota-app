@@ -6,6 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { API_KEY } from '../constants/Env';
 import MapViewDirections from 'react-native-maps-directions';
+import { createTravel } from '../api/routes';
+import toastHelper from '../utils/toast';
 
 const chooseDestination = () => {
     const [location, setLocation] = useState<{
@@ -39,6 +41,7 @@ const chooseDestination = () => {
         if (coords) {
             const { latitude, longitude } = coords;
             setLocation({ latitude, longitude });
+            console.log('Location:', latitude, longitude);
 
             let response = await Location.reverseGeocodeAsync({ latitude, longitude });
             for (let item of response) {
@@ -71,12 +74,27 @@ const chooseDestination = () => {
             const data = await response.json();
             const { lat, lng } = data.result.geometry.location;
             setDestinationCoordinates({ latitude: lat, longitude: lng });
+            console.log('Destination:', lat, lng);
             setSuggestions([]); // Limpar as sugestões após a escolha
         } catch (error) {
             console.error('Erro ao buscar detalhes do lugar:', error);
         }
     };
-
+    const handleNewTrip = async () => {
+        await createTravel({
+            latitudedestination: destinationCoordinates?.latitude || 0,
+            longitudedestination: destinationCoordinates?.longitude || 0,
+            latitudeorigin: location?.latitude || 0,
+            longitudeorigin: location?.longitude || 0,
+            passenger: 1,
+            value: 0,
+        }).then(() => {
+            toastHelper.success('Sucesso', 'Viagem solicitada com sucesso!');
+        }).catch((error) => {
+            console.error('Erro ao solicitar viagem:', error);
+            toastHelper.error('Ops!', 'Erro ao solicitar viagem. Tente novamente.');
+        });
+    }
     // Função para calcular a região do mapa com origem e destino
     const calculateRegion = () => {
         if (!location || !destinationCoordinates) return null;
@@ -89,8 +107,8 @@ const chooseDestination = () => {
         const minLongitude = Math.min(...longitudes);
         const maxLongitude = Math.max(...longitudes);
 
-        const latitudeDelta = (maxLatitude - minLatitude) + 0.1; // Delta com margem extra
-        const longitudeDelta = (maxLongitude - minLongitude) + 0.1;
+        const latitudeDelta = (maxLatitude - minLatitude) + (maxLatitude - minLatitude) * 0.2;
+        const longitudeDelta = (maxLongitude - minLongitude) + (maxLongitude - minLongitude) * 0.2;
 
         return {
             latitude: (minLatitude + maxLatitude) / 2,
@@ -177,15 +195,17 @@ const chooseDestination = () => {
                             />
                         </MapView>
                     )}
-                    <View style={styles.buttonsContainer}>
-                        <TouchableOpacity
-                            style={styles.startTripButton}
-                            onPress={() => { }}>
-                            <Text style={styles.buttonText}>
-                                {'Solicitar Viagem'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
+                    {destinationCoordinates &&
+                        <View style={styles.buttonsContainer}>
+                            <TouchableOpacity
+                                style={styles.startTripButton}
+                                onPress={handleNewTrip}>
+                                <Text style={styles.buttonText}>
+                                    {'Solicitar Viagem'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
                 </KeyboardAvoidingView>
             </SafeAreaView>
         </TouchableWithoutFeedback>

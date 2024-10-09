@@ -1,45 +1,70 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
 import TripDetailsModal from '../../components/TripDetailsModal'; // Importando o modal
 import { Trip } from '@/types/trip';
+import { getByRange } from '../../api/routes';
+import * as Location from 'expo-location';
+import toastHelper from '../../utils/toast';
 
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [radius, setRadius] = useState<number>(2);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  // const trips = [
+  //   {
+  //     id: '1',
+  //     passengerName: 'Carlos Silva',
+  //     passengerPhoto: 'https://randomuser.me/api/portraits/men/1.jpg',
+  //     distanceToPickup: '2 km',
+  //     totalDistance: '10 km',
+  //     fare: 'R$ 30,00',
+  //     pickupCoordinates: { latitude: -22.9068, longitude: -43.1729 },
+  //     dropoffCoordinates: { latitude: -23.5505, longitude: -46.6333 },
+  //   },
+  //   {
+  //     id: '2',
+  //     passengerName: 'Maria Oliveira',
+  //     passengerPhoto: 'https://randomuser.me/api/portraits/women/1.jpg',
+  //     distanceToPickup: '5 km',
+  //     totalDistance: '15 km',
+  //     fare: 'R$ 45,00',
+  //     pickupCoordinates: { latitude: -22.9083, longitude: -43.1964 },
+  //     dropoffCoordinates: { latitude: -22.2916, longitude: -43.6884 },
+  //   },
+  //   {
+  //     id: '3',
+  //     passengerName: 'João Pereira',
+  //     passengerPhoto: 'https://randomuser.me/api/portraits/men/2.jpg',
+  //     distanceToPickup: '3 km',
+  //     totalDistance: '12 km',
+  //     fare: 'R$ 40,00',
+  //     pickupCoordinates: { latitude: -22.9068, longitude: -43.1729 },
+  //     dropoffCoordinates: { latitude: -22.9083, longitude: -43.1964 },
+  //   },
+  // ];
+  const getCurrentLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Allow the app to use the location services', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK' },
+      ]);
+    }
 
-  const trips = [
-    {
-      id: '1',
-      passengerName: 'Carlos Silva',
-      passengerPhoto: 'https://randomuser.me/api/portraits/men/1.jpg',
-      distanceToPickup: '2 km',
-      totalDistance: '10 km',
-      fare: 'R$ 30,00',
-      pickupCoordinates: { latitude: -22.9068, longitude: -43.1729 },
-      dropoffCoordinates: { latitude: -23.5505, longitude: -46.6333 },
-    },
-    {
-      id: '2',
-      passengerName: 'Maria Oliveira',
-      passengerPhoto: 'https://randomuser.me/api/portraits/women/1.jpg',
-      distanceToPickup: '5 km',
-      totalDistance: '15 km',
-      fare: 'R$ 45,00',
-      pickupCoordinates: { latitude: -22.9083, longitude: -43.1964 },
-      dropoffCoordinates: { latitude: -22.2916, longitude: -43.6884 },
-    },
-    {
-      id: '3',
-      passengerName: 'João Pereira',
-      passengerPhoto: 'https://randomuser.me/api/portraits/men/2.jpg',
-      distanceToPickup: '3 km',
-      totalDistance: '12 km',
-      fare: 'R$ 40,00',
-      pickupCoordinates: { latitude: -22.9068, longitude: -43.1729 },
-      dropoffCoordinates: { latitude: -22.9083, longitude: -43.1964 },
-    },
-  ];
+    const { coords } = await Location.getCurrentPositionAsync();
+    if (coords) {
+      const { latitude, longitude } = coords;
+      setLocation({ latitude, longitude });
+
+    }
+  };
 
   const openModal = (trip: Trip) => {
     setSelectedTrip(trip);
@@ -48,6 +73,49 @@ export default function HomeScreen() {
   const closeModal = () => {
     setSelectedTrip(null);
   };
+
+  const searchTrip = async () => {
+    if (!location) {
+      setLoading(true);
+      await getCurrentLocation();
+      setLoading(false);
+    } else {
+      setLoading(true);
+      await getByRange(location.latitude, location.longitude, radius).then(data => {
+        setTrips(data.map((trip: any) => {
+          return {
+            id: trip.id,
+            passengerName: 'João Pereira',
+            passengerPhoto: 'https://randomuser.me/api/portraits/men/2.jpg',
+            distanceToPickup: trip.distance,
+            totalDistance: '12 km',
+            fare: `R$ ${trip.value.toFixed(2).replace('.', ',')}`,
+            pickupCoordinates: { latitude: trip.latitudeorigin, longitude: trip.longitudeorigin },
+            dropoffCoordinates: { latitude: trip.latitudedestination, longitude: trip.longitudedestination },
+          }
+        }))
+      }).catch((error) => {
+        console.log(error);
+        toastHelper.error('Ops!', 'Erro ao buscar viagens');
+      }).finally(() => {
+        setLoading(false);
+      })
+    }
+  }
+
+  useEffect(() => {
+    searchTrip();
+  }, [location, radius]);
+
+  if(loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
+          <Text style={styles.sectionTitle}>Carregando...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
