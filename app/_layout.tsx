@@ -31,8 +31,8 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <UserProvider>
-        <Stack screenOptions={{ headerShown: false }} initialRouteName={'login'}>
-          <Stack.Screen name="login"
+        <Stack screenOptions={{ headerShown: false }} initialRouteName={'index'}>
+          <Stack.Screen name="index"
             options={{ headerShown: false }} />
           {user?.type === 'Driver' ? (
             <Stack.Screen name="driver" options={{ headerShown: false }} />

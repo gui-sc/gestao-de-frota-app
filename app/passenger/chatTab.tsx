@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, SafeAreaView } from 'react-native';
 import UnreadBadge from '../../components/UnreadBadge';
 import dayjs from 'dayjs';
 import { useNavigation } from 'expo-router';
 import { RouteList } from '../../utils/stackParamRouteList';
+import { getChatByPassenger } from '../../api/routes';
 
 interface Chat {
   id: string;
@@ -16,35 +17,14 @@ interface Chat {
 }
 
 export default function ChatTabScreen() {
-  const [chats, setChats] = useState<Chat[]>([
-    {
-      id: '1',
-      passengerName: 'Carlos Silva',
-      passengerPhoto: 'https://randomuser.me/api/portraits/men/1.jpg',
-      lastMessage: 'Obrigado! Até logo.',
-      lastMessageTime: dayjs('2024-07-01T15:30:00Z'),
-      unread: false,
-      unreadMessageCount: 0,
-    },
-    {
-      id: '2',
-      passengerName: 'Gustavo Santos',
-      passengerPhoto: 'https://randomuser.me/api/portraits/men/5.jpg',
-      lastMessage: 'Pode me buscar em 10 minutos?',
-      lastMessageTime: dayjs('2024-07-01T14:20:00Z'),
-      unread: true,
-      unreadMessageCount: 1,
-    },
-    {
-      id: '3',
-      passengerName: 'João Pereira',
-      passengerPhoto: 'https://randomuser.me/api/portraits/men/2.jpg',
-      lastMessage: 'Chegarei no local combinado às 16h.',
-      lastMessageTime: dayjs('2024-07-01T13:55:00Z'),
-      unread: true,
-      unreadMessageCount: 3,
-    },
-  ].sort((a, b) => b.lastMessageTime.diff(a.lastMessageTime)));
+  const [chats, setChats] = useState([])
+
+  useEffect(() => {
+    getChatByPassenger('2').then((chats) => {
+      console.log("chats", chats);
+      setChats(chats);
+    })
+  }, []);
   const navigation = useNavigation<RouteList>();
   return (
     <SafeAreaView style={styles.container}>

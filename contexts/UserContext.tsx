@@ -43,8 +43,8 @@ export const UserProvider = ({ children }: {
     // Função para logar o  usuário
     const login = (userData: User) => {
         setUser(userData);
-        if(userData.type == 'Driver') navigation.navigate('driver');
-        if(userData.type == 'Passenger') navigation.navigate('passenger')
+        if (userData.type == 'Driver') navigation.navigate('driver');
+        if (userData.type == 'Passenger') navigation.navigate('passenger')
     };
 
     // Função para deslogar o usuário

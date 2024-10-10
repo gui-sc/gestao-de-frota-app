@@ -1,16 +1,26 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
 import { useNavigation } from 'expo-router';
 import { RouteList } from '@/utils/stackParamRouteList';
+import { getLastTravels } from '../../api/routes';
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
   const navigation = useNavigation<RouteList>();
-  const viagens = [
-    { id: '1', destino: 'Rio de Janeiro', data: '12/09/2024' },
-    { id: '2', destino: 'São Paulo', data: '08/09/2024' },
-    { id: '3', destino: 'Belo Horizonte', data: '02/09/2024' },
-  ];
+  const [trips, setTrips] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    getLastTravels('1', 'passenger').then((trips) => {
+      setTrips(trips);
+    });
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
 
   const handleNewTrip = () => {
     navigation.navigate('chooseDestination');
@@ -19,11 +29,10 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.header}>Olá, {user ? user.username : "undefined"}!</Text>
-
+        <Text style={styles.header}>Olá, Usuario!</Text>
         <Text style={styles.sectionTitle}>Últimas Viagens</Text>
         <FlatList
-          data={viagens}
+          data={trips}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>

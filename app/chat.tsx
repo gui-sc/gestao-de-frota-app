@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { getMessages, sendMessage } from '../api/routes';
+import { UserContext } from '../contexts/UserContext';
 
 interface Message {
     id: string;
@@ -13,6 +15,7 @@ interface Message {
 type ChatScreenRouteProp = RouteProp<{ chat: { passengerName: string; passengerPhoto: string } }>
 
 export default function ChatScreen() {
+    const { user } = useContext(UserContext);
     const route = useRoute<ChatScreenRouteProp>();
     const { passengerName, passengerPhoto } = route.params;
 
@@ -21,16 +24,18 @@ export default function ChatScreen() {
     ]);
     const [newMessage, setNewMessage] = React.useState('');
 
-    const sendMessage = () => {
+    const handleSendMessage = () => {
         if (newMessage.trim()) {
-            setMessages([
-                { id: (Date.now() + 1).toString(), text: "Ok", sender: passengerName, timestamp: new Date().getTime() },
-                { id: Date.now().toString(), text: newMessage, sender: 'Você', timestamp: new Date().getTime() },
-                ...messages,
-            ]);
+            sendMessage('1', user?.type == 'Driver' ? '1' : '2', newMessage)
             setNewMessage('');
         }
     };
+
+    useEffect(() => {
+        getMessages('1').then((messages) => {
+            setMessages(messages);
+        })
+    }, [])
 
     return (
         <SafeAreaView style={styles.container}>
@@ -69,7 +74,7 @@ export default function ChatScreen() {
                         placeholderTextColor="#ccc"
                         multiline // Permitir quebra de linha // Limitar o crescimento do input
                     />
-                    <TouchableOpacity onPress={sendMessage} style={styles.button}>
+                    <TouchableOpacity onPress={handleSendMessage} style={styles.button}>
                         <Text style={styles.buttonText}>Enviar</Text>
                     </TouchableOpacity>
                 </View>

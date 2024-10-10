@@ -7,6 +7,8 @@ import MapViewDirections from 'react-native-maps-directions';
 import { UserContext } from '../contexts/UserContext';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { API_KEY } from '../constants/Env';
+import { finishTravel, initTravel } from '../api/routes';
+import toastHelper from '../utils/toast';
 
 type MapScreenRouteProp = RouteProp<{
     map: {
@@ -123,6 +125,30 @@ const MapScreen = () => {
             setDisplayPickupAddress(address);
         }
     };
+
+    const handleInitTrip = async () => {
+        await initTravel('1').then(() => {
+            toastHelper.success('Sucesso', 'Viagem iniciada com sucesso');
+        }).catch(() => {
+            toastHelper.error('Erro', 'Erro ao iniciar a viagem');
+        })
+    }
+
+    const handleFinishTrip = async () => {
+        await finishTravel('1').then(() => {
+            toastHelper.success('Sucesso', 'Viagem finalizada com sucesso');
+        }).catch(() => {
+            toastHelper.error('Erro', 'Erro ao finalizar a viagem');
+        })
+    }
+
+    useEffect(() => {
+        if (isTripStarted) {
+            handleInitTrip()
+        } else {
+            handleFinishTrip()
+        }
+    }, [isTripStarted])
 
     return (
         <View style={styles.container}>

@@ -1,8 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Keyboard, Image } from 'react-native';
+import { View, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Keyboard, Image } from 'react-native';
 import { UserContext } from '../contexts/UserContext';
 import toastHelper from '@/utils/toast';
-import Toast from 'react-native-toast-message';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -11,7 +10,7 @@ export default function LoginScreen() {
   const { login, user } = useContext(UserContext);
 
   const handleLogin = () => {
-    if(email.split("@")[0].toLowerCase() == 'driver'){
+    if (email.split("@")[0].toLowerCase() == 'driver') {
       login({
         type: 'Driver',
         username: email.split("@")[0],
@@ -24,7 +23,7 @@ export default function LoginScreen() {
         photo: 'https://randomuser.me/api/portraits/men/1.jpg',
       });
 
-    }else{
+    } else {
       console.log('logando passenger')
       login({
         type: 'Passenger',
@@ -38,16 +37,19 @@ export default function LoginScreen() {
     }
   };
 
-  if(user) {
-    toastHelper.success('Login realizado com sucesso!', 'success');
-  }
+  useEffect(() => {
+    console.log('user', user)
+    if (user) {
+      toastHelper.success('Login realizado com sucesso!', 'success');
+    }
+  }, [user]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Image source={require('../assets/images/dc_logo.png')} 
-        style={styles.photo} 
-        resizeMode='contain'/>
+        <Image source={require('../assets/images/dc_logo.png')}
+          style={styles.photo}
+          resizeMode='contain' />
         <TextInput
           style={[styles.input, {
             marginTop: 50

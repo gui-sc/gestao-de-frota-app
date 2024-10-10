@@ -1,28 +1,37 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
+import { getImportantDates, getLastTravels } from '../../api/routes';
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
-  
-  const viagens = [
-    { id: '1', destino: 'Rio de Janeiro', data: '12/09/2024' },
-    { id: '2', destino: 'São Paulo', data: '08/09/2024' },
-    { id: '3', destino: 'Belo Horizonte', data: '02/09/2024' },
-  ];
+  const [trips, setTrips] = useState<any[]>([]);
+  const [importantDates, setImportantDates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const datasImportantes = [
-    { id: '1', evento: 'Vencimento da carteira', data: '15/10/2024' },
-    { id: '2', evento: 'Revisão do carro', data: '30/09/2024' },
-  ];
+
+  useEffect(() => {
+    setLoading(true);
+    getLastTravels('1', 'driver').then((trips) => {
+      setTrips(trips);
+    });
+    getImportantDates('1').then((dates) => {
+      setImportantDates(dates);
+    });
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.header}>Olá, {user ? user.username : "undefined"}!</Text>
+        <Text style={styles.header}>Olá, Motorista!</Text>
 
         <Text style={styles.sectionTitle}>Últimas Viagens</Text>
         <FlatList
-          data={viagens}
+          data={trips}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>
@@ -34,7 +43,7 @@ export default function HomeScreen() {
 
         <Text style={styles.sectionTitle}>Datas Importantes</Text>
         <FlatList
-          data={datasImportantes}
+          data={importantDates}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>
