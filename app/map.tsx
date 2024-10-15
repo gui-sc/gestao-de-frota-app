@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { API_KEY } from '../constants/Env';
 import { finishTravel, initTravel } from '../api/routes';
 import toastHelper from '../utils/toast';
+import LoadingIndicator from '../components/Loading';
 
 type MapScreenRouteProp = RouteProp<{
     map: {
@@ -32,7 +33,7 @@ const MapScreen = () => {
     const { pickupCoordinates, destinationCoordinates, user: tripUser } = route.params;
     const { user } = useContext(UserContext)
     const [isTripStarted, setIsTripStarted] = useState(false);
-
+    const [loading, setLoading] = useState(true);
     const [location, setLocation] = useState<{
         latitude: number;
         longitude: number;
@@ -56,9 +57,11 @@ const MapScreen = () => {
     }, [isTripStarted]);
 
     useEffect(() => {
-        getCurrentLocation();
-        getDestinationAddress();
-        getPickupAddress();
+        Promise.all([
+            getCurrentLocation(),
+            getDestinationAddress(),
+            getPickupAddress(),
+        ]).finally(() => setLoading(false));
     }, []);
 
 
@@ -149,6 +152,8 @@ const MapScreen = () => {
             handleFinishTrip()
         }
     }, [isTripStarted])
+
+    if (loading) return <LoadingIndicator />;
 
     return (
         <View style={styles.container}>

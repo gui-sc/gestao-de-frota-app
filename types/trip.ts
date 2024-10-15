@@ -21,4 +21,5 @@ export interface TripRequest {
     passenger: number;
     driver?: number;
     value: number;
+    destination: string;
 }

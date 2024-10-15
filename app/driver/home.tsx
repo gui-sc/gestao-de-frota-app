@@ -2,26 +2,41 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
 import { getImportantDates, getLastTravels } from '../../api/routes';
+import LoadingIndicator from '../../components/Loading';
+import dayjs from 'dayjs';
+import { useNavigation } from 'expo-router';
+import { RouteList } from '../../utils/stackParamRouteList';
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
   const [trips, setTrips] = useState<any[]>([]);
   const [importantDates, setImportantDates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation<RouteList>();
 
 
   useEffect(() => {
     setLoading(true);
-    getLastTravels('1', 'driver').then((trips) => {
-      setTrips(trips);
-    });
-    getImportantDates('1').then((dates) => {
-      setImportantDates(dates);
-    });
-    setLoading(false);
+    Promise.all([
+      getLastTravels('3', 'driver').then((trips) => {
+        console.log("trips", trips);
+        setTrips(trips);
+      }).catch(err => console.log("err in trips", err)),
+      getImportantDates('3').then((dates) => {
+        console.log("dates", dates);
+        setImportantDates(dates);
+      }).catch(err => console.log("err in dates", err))
+    ]).catch(err => console.log(err)).finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    console.log('user', user)
+    if (!user || user.type !== 'Driver') {
+      return navigation.navigate('index');
+    }
+  }, [])
+
   if (loading) {
-    return <Text>Loading...</Text>;
+    return <LoadingIndicator />;
   }
 
   return (
@@ -35,8 +50,10 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text style={styles.itemText}>{item.destino}</Text>
-              <Text style={styles.itemText}>{item.data}</Text>
+              <Text style={styles.itemText}>{item.destination}</Text>
+              <Text style={styles.itemText}>
+                {dayjs(item.finalTime).format('DD/MM/YYYY')} às {dayjs(item.finalTime).format('HH:mm')}
+              </Text>
             </View>
           )}
         />
@@ -47,8 +64,10 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text style={styles.itemText}>{item.evento}</Text>
-              <Text style={styles.itemText}>{item.data}</Text>
+              <Text style={styles.itemText}>{item.description}</Text>
+              <Text style={styles.itemText}>
+                {dayjs(item.date).format('DD/MM/YYYY')} às {dayjs(item.date).format('HH:mm')}
+              </Text>
             </View>
           )}
         />

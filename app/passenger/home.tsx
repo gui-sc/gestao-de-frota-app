@@ -4,6 +4,8 @@ import { UserContext } from '../../contexts/UserContext';
 import { useNavigation } from 'expo-router';
 import { RouteList } from '@/utils/stackParamRouteList';
 import { getLastTravels } from '../../api/routes';
+import LoadingIndicator from '../../components/Loading';
+import dayjs from 'dayjs';
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
   const navigation = useNavigation<RouteList>();
@@ -14,12 +16,11 @@ export default function HomeScreen() {
     setLoading(true);
     getLastTravels('1', 'passenger').then((trips) => {
       setTrips(trips);
-    });
-    setLoading(false);
+    }).finally(() => setLoading(false));
   }, []);
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return <LoadingIndicator />;
   }
 
   const handleNewTrip = () => {
@@ -36,8 +37,10 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text style={styles.itemText}>{item.destino}</Text>
-              <Text style={styles.itemText}>{item.data}</Text>
+              <Text style={styles.itemText}>{item.destination}</Text>
+              <Text style={styles.itemText}>
+                {dayjs(item.finalTime).format('DD/MM/YYYY')} às {dayjs(item.finalTime).format('HH:mm')}
+              </Text>
             </View>
           )}
         />

@@ -4,38 +4,56 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import { getMessages, sendMessage } from '../api/routes';
 import { UserContext } from '../contexts/UserContext';
+import LoadingIndicator from '../components/Loading';
 
 interface Message {
     id: string;
     text: string;
-    sender: string;
+    sender: number;
     timestamp: number;
 }
 
-type ChatScreenRouteProp = RouteProp<{ chat: { passengerName: string; passengerPhoto: string } }>
+type ChatScreenRouteProp = RouteProp<{ chat: { chatId: number } }>
 
 export default function ChatScreen() {
     const { user } = useContext(UserContext);
     const route = useRoute<ChatScreenRouteProp>();
-    const { passengerName, passengerPhoto } = route.params;
-
-    const [messages, setMessages] = React.useState<Message[]>([
-        { id: '2', text: 'Pode me buscar em 10 minutos?', sender: passengerName, timestamp: new Date().getTime() },
-    ]);
+    const { chatId } = route.params;
+    const [loading, setLoading] = React.useState(true);
+    const [seconds, setSeconds] = React.useState(0);
+    const [messages, setMessages] = React.useState<any[]>([]);
     const [newMessage, setNewMessage] = React.useState('');
 
     const handleSendMessage = () => {
         if (newMessage.trim()) {
-            sendMessage('1', user?.type == 'Driver' ? '1' : '2', newMessage)
+            sendMessage('1', newMessage, user?.type == 'Driver' ? '1' : '2').then(() => {
+                console.log("message sent");
+                getMessagesAsync();
+            }).catch(err => console.log(err));
             setNewMessage('');
         }
     };
 
-    useEffect(() => {
-        getMessages('1').then((messages) => {
+    const getMessagesAsync = async () => {
+        console.log("getting messages");
+        getMessages(chatId).then((messages) => {
+            console.log("messages", messages);
             setMessages(messages);
-        })
-    }, [])
+        }).catch(err => console.log(err)).finally(() => setLoading(false));
+    }
+
+    useEffect(() => {
+        if (seconds % 5 === 0) {
+            getMessagesAsync();
+        }
+        new Promise<void>((resolve) => setTimeout(() => {
+            setSeconds(seconds + 1);
+            resolve();
+        }, 1000));
+
+    }, [seconds])
+
+    if (loading) return <LoadingIndicator />;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -45,19 +63,18 @@ export default function ChatScreen() {
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
             >
                 <View style={styles.headerContainer}>
-                    <Image source={{ uri: passengerPhoto }} style={styles.passengerPhoto} />
-                    <Text style={styles.passengerName}>{passengerName}</Text>
+                    {/* <Image source={{ uri: passengerPhoto }} style={styles.passengerPhoto} /> */}
+                    <Text style={styles.passengerName}>{"passengerName"}</Text>
                 </View>
 
                 <FlatList
                     data={messages}
-                    inverted // Para começar pela última mensagem
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                        <View style={item.sender === 'Você' ? styles.myMessage : styles.theirMessage}>
-                            <Text style={item.sender === 'Você' ? styles.myMessageText : styles.theirMessageText}>{item.text}</Text>
-                            <Text style={item.sender === "Você" ? styles.myMessageTime : styles.theirMessageTime}>
-                                {dayjs(item.timestamp).format('HH:mm')}
+                        <View style={item.sender === 2 ? styles.myMessage : styles.theirMessage}>
+                            <Text style={item.sender === 2 ? styles.myMessageText : styles.theirMessageText}>{item.content}</Text>
+                            <Text style={item.sender === 2 ? styles.myMessageTime : styles.theirMessageTime}>
+                                {dayjs(item.updatedAt).format('HH:mm')}
                             </Text>
                         </View>
                     )}

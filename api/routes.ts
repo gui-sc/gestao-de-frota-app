@@ -23,7 +23,7 @@ export const getByRange = async (lat: number, long: number, radius: number) => {
 }
 
 export const getLastTravels = async (id: string, type: 'driver' | 'passenger') => {
-    return api.get(`/travel/${type}/${id}`).then(response => {
+    return api.get(`/travel/last/${type}/${id}`).then(response => {
         return response.data
     }).catch(error => {
         throw error
@@ -94,7 +94,7 @@ export const sendMessage = async (id: string, message: string, user: string) => 
     })
 }
 
-export const getMessages = async (id: string) => {
+export const getMessages = async (id: number) => {
     return api.get(`/chat/message/${id}`).then(response => {
         return response.data
     }).catch(error => {

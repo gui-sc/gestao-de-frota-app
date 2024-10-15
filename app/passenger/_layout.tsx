@@ -13,9 +13,10 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-      }}>
+      }}
+      initialRouteName='home'>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: 'Início',
           tabBarIcon: ({ color, focused }) => (

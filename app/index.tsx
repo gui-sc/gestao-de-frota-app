@@ -12,6 +12,7 @@ export default function LoginScreen() {
   const handleLogin = () => {
     if (email.split("@")[0].toLowerCase() == 'driver') {
       login({
+        id: 3,
         type: 'Driver',
         username: email.split("@")[0],
         email,
@@ -26,6 +27,7 @@ export default function LoginScreen() {
     } else {
       console.log('logando passenger')
       login({
+        id: 1,
         type: 'Passenger',
         username: email.split("@")[0],
         email,

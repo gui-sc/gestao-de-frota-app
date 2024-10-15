@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { useNavigation } from 'expo-router';
 import { RouteList } from '../../utils/stackParamRouteList';
 import { getChatByPassenger } from '../../api/routes';
+import LoadingIndicator from '../../components/Loading';
 
 interface Chat {
   id: string;
@@ -18,14 +19,19 @@ interface Chat {
 
 export default function ChatTabScreen() {
   const [chats, setChats] = useState([])
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     getChatByPassenger('2').then((chats) => {
       console.log("chats", chats);
       setChats(chats);
-    })
+    }).finally(() => setLoading(false));
   }, []);
   const navigation = useNavigation<RouteList>();
+
+  if (loading) return <LoadingIndicator />;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
@@ -33,21 +39,21 @@ export default function ChatTabScreen() {
         <FlatList
           data={chats}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }: { item: Chat }) => (
+          renderItem={({ item }: { item: any }) => (
             <TouchableOpacity
               style={styles.chatItem}
-              onPress={() => navigation.navigate('chat', { passengerName: item.passengerName, passengerPhoto: item.passengerPhoto })}
+              onPress={() => navigation.navigate('chat', { chatId: item.chat_id })}
             >
               <Image source={{ uri: item.passengerPhoto }} style={styles.photo} />
               <View style={styles.chatDetails}>
-                <Text style={[styles.passengerName, item.unread && styles.unread]}>
+                <Text style={[styles.passengerName, item.unread_count && styles.unread]}>
                   {item.passengerName}
                 </Text>
-                <Text style={[styles.lastMessage, item.unread && styles.unread]}>{item.lastMessage}</Text>
+                <Text style={[styles.lastMessage, item.unread_count && styles.unread]}>{item.lastMessage}</Text>
               </View>
               <View style={styles.messageConfig}>
-                <Text style={styles.lastMessageTime}>{item.lastMessageTime.format('HH:mm')}</Text>
-                {item.unread && <UnreadBadge count={item.unreadMessageCount} />}
+                <Text style={styles.last_message_time}>{dayjs(item.last_message_time).format('HH:mm')}</Text>
+                {item.unread_count && <UnreadBadge count={Number(item.unread_count)} />}
               </View>
             </TouchableOpacity>
           )}
@@ -94,7 +100,7 @@ const styles = StyleSheet.create({
   lastMessage: {
     color: '#ccc',
   },
-  lastMessageTime: {
+  last_message_time: {
     color: '#ccc',
     fontSize: 12,
     textAlign: 'center', // Centraliza o horário na coluna

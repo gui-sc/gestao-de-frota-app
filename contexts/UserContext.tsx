@@ -3,6 +3,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { createContext, useState } from 'react';
 import { RouteList } from '../utils/stackParamRouteList';
 type User = {
+    id: number;
     type: 'Driver';
     username: string;
     email: string;
@@ -13,6 +14,7 @@ type User = {
     carModel: string;
     licensePlate: string;
 } | {
+    id: number;
     type: 'Passenger';
     username: string;
     email: string;
@@ -50,7 +52,7 @@ export const UserProvider = ({ children }: {
     // Função para deslogar o usuário
     const logout = () => {
         setUser(null);
-        navigation.navigate('login');
+        navigation.navigate('index');
     };
 
     return <UserContext.Provider value={{ user, login, logout }}>

@@ -8,6 +8,7 @@ import { API_KEY } from '../constants/Env';
 import MapViewDirections from 'react-native-maps-directions';
 import { createTravel } from '../api/routes';
 import toastHelper from '../utils/toast';
+import LoadingIndicator from '../components/Loading';
 
 const chooseDestination = () => {
     const [location, setLocation] = useState<{
@@ -22,9 +23,10 @@ const chooseDestination = () => {
     const [suggestions, setSuggestions] = useState<Array<any>>([]);
     const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Carregando...');
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getCurrentLocation();
+        getCurrentLocation().finally(() => setLoading(false));
     }, []);
 
     const getCurrentLocation = async () => {
@@ -88,6 +90,7 @@ const chooseDestination = () => {
             longitudeorigin: location?.longitude || 0,
             passenger: 1,
             value: 0,
+            destination,
         }).then(() => {
             toastHelper.success('Sucesso', 'Viagem solicitada com sucesso!');
         }).catch((error) => {
@@ -117,6 +120,8 @@ const chooseDestination = () => {
             longitudeDelta
         };
     };
+
+    if(loading) return <LoadingIndicator />;
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

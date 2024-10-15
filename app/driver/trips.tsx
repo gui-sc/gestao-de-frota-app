@@ -6,6 +6,7 @@ import { Trip } from '@/types/trip';
 import { getByRange } from '../../api/routes';
 import * as Location from 'expo-location';
 import toastHelper from '../../utils/toast';
+import LoadingIndicator from '../../components/Loading';
 
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
@@ -77,8 +78,7 @@ export default function HomeScreen() {
   const searchTrip = async () => {
     if (!location) {
       setLoading(true);
-      await getCurrentLocation();
-      setLoading(false);
+      await getCurrentLocation().finally(() => setLoading(false));
     } else {
       setLoading(true);
       await getByRange(location.latitude, location.longitude, radius).then(data => {
@@ -87,7 +87,7 @@ export default function HomeScreen() {
             id: trip.id,
             passengerName: 'João Pereira',
             passengerPhoto: 'https://randomuser.me/api/portraits/men/2.jpg',
-            distanceToPickup: trip.distance,
+            distanceToPickup: (trip.distance / 1000).toFixed(2) + ' km',
             totalDistance: '12 km',
             fare: `R$ ${trip.value.toFixed(2).replace('.', ',')}`,
             pickupCoordinates: { latitude: trip.latitudeorigin, longitude: trip.longitudeorigin },
@@ -107,14 +107,8 @@ export default function HomeScreen() {
     searchTrip();
   }, [location, radius]);
 
-  if(loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.container}>
-          <Text style={styles.sectionTitle}>Carregando...</Text>
-        </View>
-      </SafeAreaView>
-    );
+  if (loading) {
+    return <LoadingIndicator />;
   }
 
   return (
