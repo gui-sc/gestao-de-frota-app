@@ -104,7 +104,7 @@ const PendingTrip = () => {
     const checkTripStatus = async () => {
         try {
             if (isDriverAssigned) return;
-            const tripDriver = await getTripDriver(tripId);
+            const { driver: tripDriver } = await getTripDriver(tripId);
             if (tripDriver) {
                 setIsDriverAssigned(true);
                 setOtherUserInfo({
