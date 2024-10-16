@@ -2,6 +2,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 
 export type RootStackParamList = {
     index: undefined;
+    pendingTrip: { tripId: number };
     chat: { chatId: number };
     driver: undefined;
     passenger: undefined;

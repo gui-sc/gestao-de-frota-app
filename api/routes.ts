@@ -125,3 +125,27 @@ export const getImportantDates = async (id: string) => {
         throw error
     })
 }
+
+export const updateLocation = async (id: number, latitude: number, longitude: number, type: 'driver' | 'passenger') => {
+    return api.put(`/travel/location/${id}`, { latitude, longitude, type }).then(response => {
+        return response.data
+    }).catch(error => {
+        throw error
+    })
+}
+
+export const getLocation = async (id: number, type: 'driver' | 'passenger') => {
+    return api.get(`/travel/location/${id}/${type}`).then(response => {
+        return response.data
+    }).catch(error => {
+        throw error
+    })
+}
+
+export const getTripDriver = async (id: number) => {
+    return api.get(`/travel/driver/${id}`).then(response => {
+        return response.data
+    }).catch(error => {
+        throw error
+    })
+}

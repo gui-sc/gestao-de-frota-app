@@ -9,6 +9,7 @@ import MapViewDirections from 'react-native-maps-directions';
 import { createTravel } from '../api/routes';
 import toastHelper from '../utils/toast';
 import LoadingIndicator from '../components/Loading';
+import { RouteList } from '../utils/stackParamRouteList';
 
 const chooseDestination = () => {
     const [location, setLocation] = useState<{
@@ -22,7 +23,7 @@ const chooseDestination = () => {
     } | null>(null);
     const [suggestions, setSuggestions] = useState<Array<any>>([]);
     const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Carregando...');
-    const navigation = useNavigation();
+    const navigation = useNavigation<RouteList>();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -93,6 +94,7 @@ const chooseDestination = () => {
             destination,
         }).then(() => {
             toastHelper.success('Sucesso', 'Viagem solicitada com sucesso!');
+            navigation.navigate('pendingTrip', { tripId: 1 });
         }).catch((error) => {
             console.error('Erro ao solicitar viagem:', error);
             toastHelper.error('Ops!', 'Erro ao solicitar viagem. Tente novamente.');

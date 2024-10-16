@@ -16,7 +16,7 @@ export default function HomeScreen() {
     setLoading(true);
     getLastTravels('1', 'passenger').then((trips) => {
       setTrips(trips);
-    }).finally(() => setLoading(false));
+    }).catch(err => console.log(err)).finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -36,7 +36,7 @@ export default function HomeScreen() {
           data={trips}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.item}>
+            <View key={item.id} style={styles.item}>
               <Text style={styles.itemText}>{item.destination}</Text>
               <Text style={styles.itemText}>
                 {dayjs(item.finalTime).format('DD/MM/YYYY')} às {dayjs(item.finalTime).format('HH:mm')}
