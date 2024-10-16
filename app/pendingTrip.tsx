@@ -19,11 +19,11 @@ const PendingTrip = () => {
     const [otherLocation, setOtherLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const [loading, setLoading] = useState(true);
     const [role, setRole] = useState<'passenger' | 'driver'>('passenger'); // Exemplo para distinguir entre motorista e passageiro
-    const [isDriverAssigned, setIsDriverAssigned] = useState<boolean>(true);
-    const [driverInfo, setDriverInfo] = useState<{ name: string; avatarUrl: string } | null>({
+    const [isDriverAssigned, setIsDriverAssigned] = useState<boolean>(role === 'driver');
+    const [otherUserInfo, setOtherUserInfo] = useState<{ name: string; avatarUrl: string } | null>(role == 'driver' ? {
         name: 'Motorista',
         avatarUrl: 'https://randomuser.me/api/portraits/men/2.jpg'
-    });
+    } : null);
     const navigation = useNavigation<RouteList>();
     const [messageSearch, setMessageSearch] = useState('Procurando motorista');
     useEffect(() => {
@@ -104,16 +104,16 @@ const PendingTrip = () => {
     const checkTripStatus = async () => {
         try {
             if (isDriverAssigned) return;
-            // const tripDriver = await getTripDriver(tripId);
-            // if (tripDriver) {
-            //     setIsDriverAssigned(true);
-            //     setDriverInfo({
-            //         name: tripDriver.name,
-            //         avatarUrl: tripDriver.avatarUrl,
-            //     });
-            //     // Atualiza a localização imediatamente após a atribuição do motorista
-            //     updateLocations();
-            // }
+            const tripDriver = await getTripDriver(tripId);
+            if (tripDriver) {
+                setIsDriverAssigned(true);
+                setOtherUserInfo({
+                    name: tripDriver.name,
+                    avatarUrl: tripDriver.avatarUrl,
+                });
+                // Atualiza a localização imediatamente após a atribuição do motorista
+                updateLocations();
+            }
         } catch (error) {
             console.error('Erro ao verificar o status da viagem:', error);
         }
@@ -146,17 +146,17 @@ const PendingTrip = () => {
     return (
         <SafeAreaView style={styles.container}>
             {/* Cabeçalho com nome e foto do motorista */}
-            {isDriverAssigned && driverInfo && (
+            {otherUserInfo && (
                 <View style={styles.header}>
                     <View style={styles.userInfo}>
-                        <Image source={{ uri: driverInfo.avatarUrl }} style={styles.avatar} />
-                        <Text style={styles.userName}>{driverInfo.name}</Text>
+                        <Image source={{ uri: otherUserInfo.avatarUrl }} style={styles.avatar} />
+                        <Text style={styles.userName}>{otherUserInfo.name}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('chat', {chatId: 1})}>
-                            <Text>
-                                <Icon name="message1" size={24} color="#fff" />  {/* Botão de Voltar */}
-                            </Text>
-                        </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('chat', { chatId: 1 })}>
+                        <Text>
+                            <Icon name="message1" size={24} color="#fff" />  {/* Botão de Voltar */}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             )}
             <MapView
