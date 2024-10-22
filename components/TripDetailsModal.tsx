@@ -18,13 +18,14 @@ const TripDetailsModal = ({
     if (!trip) return null;
 
     const handleAcceptTrip = () => {
-        navigation.navigate('map', {
+        navigation.navigate('pendingTrip', {
+            tripId: trip.id,
             pickupCoordinates: trip.pickupCoordinates,
             destinationCoordinates: trip.dropoffCoordinates,
-            user: {
+            passenger: {
                 name: trip.passengerName,
-                photo: trip.passengerPhoto,
-            },
+                avatar: trip.passengerPhoto,
+            } 
         });
         onClose();
     }

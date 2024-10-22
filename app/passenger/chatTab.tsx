@@ -8,15 +8,15 @@ import { getChatByPassenger } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
 
 interface Chat {
-  id: string;
-  passengerName: string;
-  passengerPhoto: string;
+  chat_id: number;
+  driver: number;
+  passenger: string;
+  driver_name: string;
+  avatar: string;
   lastMessage: string;
-  unreadMessageCount: number;
-  lastMessageTime: dayjs.Dayjs; // Ex.: '15:30'
-  unread: boolean; // Indicador de mensagens não lidas
+  unread_count: number;
+  last_message_time: dayjs.Dayjs; // Ex.: '15:30'
 }
-
 export default function ChatTabScreen() {
   const [chats, setChats] = useState([])
   const [loading, setLoading] = useState(true);
@@ -38,18 +38,18 @@ export default function ChatTabScreen() {
         <Text style={styles.header}>Conversas</Text>
         <FlatList
           data={chats}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }: { item: any }) => (
+          keyExtractor={(item) => item.chat_id.toString()}
+          renderItem={({ item }: { item: Chat }) => (
             <TouchableOpacity
               style={styles.chatItem}
               onPress={() => navigation.navigate('chat', { chatId: item.chat_id })}
             >
-              <Image source={{ uri: item.passengerPhoto }} style={styles.photo} />
+              <Image source={{ uri: item.avatar }} style={styles.photo} />
               <View style={styles.chatDetails}>
-                <Text style={[styles.passengerName, item.unread_count && styles.unread]}>
-                  {item.passengerName}
+                <Text style={[styles.passengerName, item.unread_count > 0 && styles.unread]}>
+                  {item.driver_name}
                 </Text>
-                <Text style={[styles.lastMessage, item.unread_count && styles.unread]}>{item.lastMessage}</Text>
+                <Text style={[styles.lastMessage, item.unread_count > 0 && styles.unread]}>{item.lastMessage}</Text>
               </View>
               <View style={styles.messageConfig}>
                 <Text style={styles.last_message_time}>{dayjs(item.last_message_time).format('HH:mm')}</Text>

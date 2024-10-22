@@ -5,6 +5,9 @@ import dayjs from 'dayjs';
 import { getMessages, sendMessage } from '../api/routes';
 import { UserContext } from '../contexts/UserContext';
 import LoadingIndicator from '../components/Loading';
+import toastHelper from '../utils/toast';
+import { useNavigation } from 'expo-router';
+import { RouteList } from '../utils/stackParamRouteList';
 
 interface Message {
     id: string;
@@ -23,10 +26,14 @@ export default function ChatScreen() {
     const [seconds, setSeconds] = React.useState(0);
     const [messages, setMessages] = React.useState<any[]>([]);
     const [newMessage, setNewMessage] = React.useState('');
-
+    const navigation = useNavigation<RouteList>();
     const handleSendMessage = () => {
+        if (!user) {
+            toastHelper.info('Ops', 'Você precisa estar logado para enviar mensagens');
+            return navigation.navigate('index');
+        }
         if (newMessage.trim()) {
-            sendMessage('1', newMessage, user?.type == 'Driver' ? '1' : '2').then(() => {
+            sendMessage(chatId.toString(), newMessage, user.id).then(() => {
                 console.log("message sent");
                 getMessagesAsync();
             }).catch(err => console.log(err));

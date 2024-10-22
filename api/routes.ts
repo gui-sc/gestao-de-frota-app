@@ -54,7 +54,7 @@ export const cancelTravel = async (id: string) => {
     })
 }
 
-export const finishTravel = async (id: string) => {
+export const finishTravel = async (id: number) => {
     return api.put(`/travel/${id}/finish`).then(response => {
         return response.data
     }).catch(error => {
@@ -62,7 +62,7 @@ export const finishTravel = async (id: string) => {
     })
 }
 
-export const initTravel = async (id: string) => {
+export const initTravel = async (id: number) => {
     return api.put(`/travel/${id}/init`).then(response => {
         return response.data
     }).catch(error => {
@@ -86,7 +86,7 @@ export const getChat = async (id: string) => {
     })
 }
 
-export const sendMessage = async (id: string, message: string, user: string) => {
+export const sendMessage = async (id: string, message: string, user: number) => {
     return api.post(`/chat/message/${id}`, { content: message, sender: user }).then(response => {
         return response.data
     }).catch(error => {

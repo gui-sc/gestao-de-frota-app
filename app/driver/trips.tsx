@@ -85,10 +85,10 @@ export default function HomeScreen() {
         setTrips(data.map((trip: any) => {
           return {
             id: trip.id,
-            passengerName: 'João Pereira',
-            passengerPhoto: 'https://randomuser.me/api/portraits/men/2.jpg',
+            passengerName: trip.passenger_name,
+            passengerPhoto: trip.passenger_avatar,
             distanceToPickup: (trip.distance / 1000).toFixed(2) + ' km',
-            totalDistance: '12 km',
+            totalDistance: (trip.total_distance / 1000).toFixed(2) + ' km',
             fare: `R$ ${trip.value.toFixed(2).replace('.', ',')}`,
             pickupCoordinates: { latitude: trip.latitudeorigin, longitude: trip.longitudeorigin },
             dropoffCoordinates: { latitude: trip.latitudedestination, longitude: trip.longitudedestination },
@@ -117,7 +117,7 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>Viagens Solicitadas</Text>
         <FlatList
           data={trips}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => openModal(item)}>
               <View style={styles.item}>

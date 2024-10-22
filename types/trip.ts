@@ -4,7 +4,7 @@ export interface Coordinates {
 }
 
 export interface Trip {
-    id: string;
+    id: number;
     passengerName: string;
     passengerPhoto: string;
     distanceToPickup: string;

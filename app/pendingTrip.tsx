@@ -1,31 +1,71 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Alert, Image, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { API_KEY } from '../constants/Env';
 import MapViewDirections from 'react-native-maps-directions';
-import { updateLocation, getLocation, getTripDriver } from '../api/routes';
+import { updateLocation, getLocation, getTripDriver, initTravel, finishTravel } from '../api/routes';
 import LoadingIndicator from '../components/Loading';
 import { RouteList } from '../utils/stackParamRouteList';
 import Icon from 'react-native-vector-icons/AntDesign';
+import toastHelper from '../utils/toast';
+import { UserContext } from '../contexts/UserContext';
 
-type PendingTripProp = RouteProp<{ pendingTrip: { tripId: number } }, 'pendingTrip'>;
+type PendingTripProp = RouteProp<{
+    pendingTrip: {
+        pickupCoordinates: {
+            latitude: number;
+            longitude: number;
+        };
+        destinationCoordinates: {
+            latitude: number;
+            longitude: number;
+        };
+        passenger: {
+            name: string;
+            avatar?: string;
+        };
+        tripId: number;
+        destination: string;
+    }
+}, 'pendingTrip'>;
 
 const PendingTrip = () => {
+    const { user } = useContext(UserContext);
     const route = useRoute<PendingTripProp>();
-    const { tripId } = route.params;
+    const { tripId, destinationCoordinates, pickupCoordinates, passenger, destination } = route.params;
     const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const [otherLocation, setOtherLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const [loading, setLoading] = useState(true);
-    const [role, setRole] = useState<'passenger' | 'driver'>('passenger'); // Exemplo para distinguir entre motorista e passageiro
+    const [isTripStarted, setIsTripStarted] = useState(false);
+    const [role, setRole] = useState<'passenger' | 'driver' | null>(null); // Exemplo para distinguir entre motorista e passageiro
     const [isDriverAssigned, setIsDriverAssigned] = useState<boolean>(role === 'driver');
-    const [otherUserInfo, setOtherUserInfo] = useState<{ name: string; avatarUrl: string } | null>(role == 'driver' ? {
-        name: 'Motorista',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/2.jpg'
-    } : null);
+    const [tripTime, setTripTime] = useState(0);
+    const [intervalId, setIntervalId] = useState<NodeJS.Timer | null>(null);
+    const [otherUserInfo, setOtherUserInfo] = useState<{ name: string; avatar?: string } | null>(null);
     const navigation = useNavigation<RouteList>();
     const [messageSearch, setMessageSearch] = useState('Procurando motorista');
+
+    useEffect(() => {
+        if (isTripStarted) {
+            const id = setInterval(() => {
+                setTripTime(prev => prev + 1);  // Incrementa o tempo da viagem a cada segundo
+            }, 1000);
+            setIntervalId(id);
+        } else if (!isTripStarted && intervalId) {
+            clearInterval(intervalId as unknown as number);
+        }
+    }, [isTripStarted]);
+
+    useEffect(() => {
+        if (user) {
+            setRole(user.type === 'Driver' ? 'driver' : 'passenger')
+            setIsDriverAssigned(user.type === 'Driver')
+            setOtherUserInfo(user.type === 'Driver' ? passenger : null)
+        }
+    }, [user])
+
     useEffect(() => {
         const interval = setInterval(() => {
             setMessageSearch((prev) => {
@@ -49,7 +89,10 @@ const PendingTrip = () => {
 
     useEffect(() => {
         let locationInterval: NodeJS.Timeout;
-        if (isDriverAssigned) {
+        console.log('isDriverAssigned:', isDriverAssigned);
+        console.log('isTripStarted:', isTripStarted);
+        if (isDriverAssigned && isTripStarted) {
+            console.log('Iniciando a atualização das localizações...');
             // Inicia a atualização das localizações somente quando o motorista for atribuído
             locationInterval = setInterval(() => {
                 updateLocations();
@@ -78,8 +121,8 @@ const PendingTrip = () => {
 
     const updateSelfLocation = async () => {
         try {
-            if (userLocation) {
-                // await updateLocation(tripId, userLocation.latitude, userLocation.longitude, role);
+            if (userLocation && role) {
+                await updateLocation(tripId, userLocation.latitude, userLocation.longitude, role);
             }
         } catch (error) {
             console.error('Erro ao atualizar a localização:', error);
@@ -89,10 +132,18 @@ const PendingTrip = () => {
     const updateLocations = async () => {
         try {
             if (role === 'passenger') {
-                // const driverLoc = await getLocation(tripId, 'driver'); // Função que busca a localização do motorista
+                const driverLoc = await getLocation(tripId, 'driver').catch(err => {
+                    console.error('Erro ao buscar a localização do motorista:', err);
+                    throw err;
+                }); // Função que busca a localização do motorista
+                console.log('Localização do motorista:', driverLoc);
                 setOtherLocation({ latitude: -29.11037478534928, longitude: -49.62256924856739 });
             } else {
-                // const passengerLoc = await getLocation(tripId, 'passenger'); // Função que busca a localização do passageiro
+                const passengerLoc = await getLocation(tripId, 'passenger').catch(err => {
+                    console.error('Erro ao buscar a localização do passageiro:', err);
+                    throw err;
+                }); // Função que busca a localização do passageiro
+                console.log('Localização do passageiro:', passengerLoc);
                 setOtherLocation({ latitude: 19.2949123, longitude: -99.1503933 });
             }
             console.log('Localização do outro usuário atualizada');
@@ -103,13 +154,17 @@ const PendingTrip = () => {
 
     const checkTripStatus = async () => {
         try {
-            if (isDriverAssigned) return;
+            console.log('Verificando status da viagem...');
+            console.log('isDriverAssigned:', isDriverAssigned);
+            console.log('isTripStarted:', isTripStarted);
+            if (isDriverAssigned || !isTripStarted) return;
+            console.log('Buscando motorista...');
             const { driver: tripDriver } = await getTripDriver(tripId);
             if (tripDriver) {
                 setIsDriverAssigned(true);
                 setOtherUserInfo({
                     name: tripDriver.name,
-                    avatarUrl: tripDriver.avatarUrl,
+                    avatar: tripDriver.avatarUrl,
                 });
                 // Atualiza a localização imediatamente após a atribuição do motorista
                 updateLocations();
@@ -120,16 +175,16 @@ const PendingTrip = () => {
     };
 
     const calculateRegion = () => {
-        if (!userLocation || !otherLocation) return null;
-
-        const latitudes = [userLocation.latitude, otherLocation.latitude];
-        const longitudes = [userLocation.longitude, otherLocation.longitude];
+        const points = [userLocation, pickupCoordinates, destinationCoordinates];
+        const latitudes = points.map(point => point?.latitude).filter(Boolean) as number[];
+        const longitudes = points.map(point => point?.longitude).filter(Boolean) as number[];
 
         const minLatitude = Math.min(...latitudes);
         const maxLatitude = Math.max(...latitudes);
         const minLongitude = Math.min(...longitudes);
         const maxLongitude = Math.max(...longitudes);
 
+        // Ajuste no multiplicador para adicionar mais margem
         const latitudeDelta = (maxLatitude - minLatitude) + (maxLatitude - minLatitude) * 0.2;
         const longitudeDelta = (maxLongitude - minLongitude) + (maxLongitude - minLongitude) * 0.2;
 
@@ -140,6 +195,21 @@ const PendingTrip = () => {
             longitudeDelta
         };
     };
+    const handleInitTrip = async () => {
+        await initTravel(tripId).then(() => {
+            toastHelper.success('Sucesso', 'Viagem iniciada com sucesso');
+        }).catch(() => {
+            toastHelper.error('Erro', 'Erro ao iniciar a viagem');
+        })
+    }
+
+    const handleFinishTrip = async () => {
+        await finishTravel(tripId).then(() => {
+            toastHelper.success('Sucesso', 'Viagem finalizada com sucesso');
+        }).catch(() => {
+            toastHelper.error('Erro', 'Erro ao finalizar a viagem');
+        })
+    }
 
     if (loading) return <LoadingIndicator />;
 
@@ -149,7 +219,9 @@ const PendingTrip = () => {
             {otherUserInfo && (
                 <View style={styles.header}>
                     <View style={styles.userInfo}>
-                        <Image source={{ uri: otherUserInfo.avatarUrl }} style={styles.avatar} />
+                        {otherUserInfo.avatar &&
+                            <Image source={{ uri: otherUserInfo.avatar }} style={styles.avatar} />
+                        }
                         <Text style={styles.userName}>{otherUserInfo.name}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('chat', { chatId: 1 })}>
@@ -169,6 +241,10 @@ const PendingTrip = () => {
                 }}
                 loadingEnabled={true}
             >
+                <Marker coordinate={destinationCoordinates}
+                    title={role === 'passenger' ? 'Seu destino' : `Destino de ${route.params.passenger.name}`}
+                    description={destination}
+                />
                 {userLocation && (
                     <Marker coordinate={userLocation} title="Você" />
                 )}
@@ -176,10 +252,10 @@ const PendingTrip = () => {
                     <Marker coordinate={otherLocation} title={role === 'passenger' ? 'Motorista' : 'Passageiro'} />
                 )}
 
-                {userLocation && otherLocation && (
+                {userLocation && otherLocation && role == 'driver' && (
                     <MapViewDirections
                         origin={userLocation}
-                        destination={otherLocation}
+                        destination={isTripStarted ? otherLocation : pickupCoordinates}
                         strokeWidth={4}
                         strokeColor='#111111'
                         apikey={API_KEY}
@@ -194,8 +270,25 @@ const PendingTrip = () => {
             )}
 
             <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.cancelTripButton} onPress={() => navigation.goBack()}>
-                    <Text style={styles.buttonText}>Cancelar Viagem</Text>
+                {/* Contador de tempo de viagem */}
+                {isTripStarted && (
+                    <View style={styles.tripTimeContainer}>
+                        <Text style={styles.tripTimeText}>Tempo de viagem: {Math.floor(tripTime / 60)}:{tripTime % 60 < 10 ? `0${tripTime % 60}` : tripTime % 60}</Text>
+                    </View>
+                )}
+                <TouchableOpacity
+                    style={isTripStarted ? styles.finishTripButton : styles.startTripButton}
+                    onPress={() => {
+                        if (!isTripStarted) {
+                            handleInitTrip()
+                        } else {
+                            handleFinishTrip()
+                        }
+                        setIsTripStarted(!isTripStarted)
+                    }}>
+                    <Text style={styles.buttonText}>
+                        {isTripStarted ? 'Finalizar Viagem' : 'Iniciar Viagem'}
+                    </Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -206,6 +299,31 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#000',
+    },
+    passengerPhoto: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginRight: 10,
+    },
+    tripTimeContainer: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        padding: 10,
+        borderRadius: 5,
+    },
+    tripTimeText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    startTripButton: {
+        backgroundColor: '#4CAF50',
+        padding: 10,
+        borderRadius: 5,
+    },
+    finishTripButton: {
+        backgroundColor: '#FF0000',
+        padding: 10,
+        borderRadius: 5,
     },
     driverSearchContainer: {
         position: 'absolute',

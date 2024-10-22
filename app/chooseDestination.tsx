@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Alert, StyleSheet, View, Text, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, TextInput, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -10,8 +10,10 @@ import { createTravel } from '../api/routes';
 import toastHelper from '../utils/toast';
 import LoadingIndicator from '../components/Loading';
 import { RouteList } from '../utils/stackParamRouteList';
+import { UserContext } from '../contexts/UserContext';
 
 const chooseDestination = () => {
+    const { user } = useContext(UserContext);
     const [location, setLocation] = useState<{
         latitude: number;
         longitude: number;
@@ -83,18 +85,56 @@ const chooseDestination = () => {
             console.error('Erro ao buscar detalhes do lugar:', error);
         }
     };
+
+    const calculateDistance = () => {
+        if (!location || !destinationCoordinates) return null;
+
+        const R = 6371e3; // metres
+        const φ1 = location.latitude * Math.PI / 180; // φ, λ in radians
+        const φ2 = destinationCoordinates.latitude * Math.PI / 180;
+        const Δφ = (destinationCoordinates.latitude - location.latitude) * Math.PI / 180;
+        const Δλ = (destinationCoordinates.longitude - location.longitude) * Math.PI / 180;
+
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // in metres
+    }
     const handleNewTrip = async () => {
+        if (!user) {
+            toastHelper.info('Ops!', 'Você precisa estar logado para solicitar uma viagem.');
+            return navigation.navigate('index');
+        }
+        if (!destinationCoordinates) {
+            toastHelper.info('Ops!', 'Você precisa escolher um destino para solicitar uma viagem.');
+            return;
+        }
+        if (!location) {
+            toastHelper.info('Ops!', 'Não foi possível obter sua localização. Tente novamente.');
+            return;
+        }
+        const taxiValue = 2.5;
         await createTravel({
-            latitudedestination: destinationCoordinates?.latitude || 0,
-            longitudedestination: destinationCoordinates?.longitude || 0,
-            latitudeorigin: location?.latitude || 0,
-            longitudeorigin: location?.longitude || 0,
-            passenger: 1,
-            value: 0,
+            latitudedestination: destinationCoordinates.latitude,
+            longitudedestination: destinationCoordinates.longitude,
+            latitudeorigin: location.latitude,
+            longitudeorigin: location.longitude,
+            passenger: user.id,
+            value: calculateDistance()! * 0.00001 + taxiValue,
             destination,
-        }).then(() => {
+        }).then((res) => {
             toastHelper.success('Sucesso', 'Viagem solicitada com sucesso!');
-            navigation.navigate('pendingTrip', { tripId: 1 });
+            navigation.navigate('pendingTrip', {
+                tripId: res.id,
+                destinationCoordinates,
+                passenger: {
+                    name: user.fullName,
+                    avatar: user.photo,
+                },
+                pickupCoordinates: location,
+            });
         }).catch((error) => {
             console.error('Erro ao solicitar viagem:', error);
             toastHelper.error('Ops!', 'Erro ao solicitar viagem. Tente novamente.');
@@ -123,7 +163,7 @@ const chooseDestination = () => {
         };
     };
 
-    if(loading) return <LoadingIndicator />;
+    if (loading) return <LoadingIndicator />;
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -209,6 +249,9 @@ const chooseDestination = () => {
                                 onPress={handleNewTrip}>
                                 <Text style={styles.buttonText}>
                                     {'Solicitar Viagem'}
+                                </Text>
+                                <Text style={styles.buttonText}>
+                                    {`Valor: R$ ${calculateDistance()! * 0.00001 + 2.5}`}
                                 </Text>
                             </TouchableOpacity>
                         </View>

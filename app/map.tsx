@@ -24,13 +24,14 @@ type MapScreenRouteProp = RouteProp<{
         user: {
             name: string;
             photo: string;
-        }
+        },
+        routeId: number;
     };
 }>
 const MapScreen = () => {
 
     const route = useRoute<MapScreenRouteProp>();
-    const { pickupCoordinates, destinationCoordinates, user: tripUser } = route.params;
+    const { pickupCoordinates, destinationCoordinates, user: tripUser, routeId } = route.params;
     const { user } = useContext(UserContext)
     const [isTripStarted, setIsTripStarted] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -130,7 +131,7 @@ const MapScreen = () => {
     };
 
     const handleInitTrip = async () => {
-        await initTravel('1').then(() => {
+        await initTravel(routeId).then(() => {
             toastHelper.success('Sucesso', 'Viagem iniciada com sucesso');
         }).catch(() => {
             toastHelper.error('Erro', 'Erro ao iniciar a viagem');
@@ -138,20 +139,12 @@ const MapScreen = () => {
     }
 
     const handleFinishTrip = async () => {
-        await finishTravel('1').then(() => {
+        await finishTravel(routeId).then(() => {
             toastHelper.success('Sucesso', 'Viagem finalizada com sucesso');
         }).catch(() => {
             toastHelper.error('Erro', 'Erro ao finalizar a viagem');
         })
     }
-
-    useEffect(() => {
-        if (isTripStarted) {
-            handleInitTrip()
-        } else {
-            handleFinishTrip()
-        }
-    }, [isTripStarted])
 
     if (loading) return <LoadingIndicator />;
 
@@ -185,7 +178,7 @@ const MapScreen = () => {
                     {!isTripStarted && (
                         <Marker coordinate={pickupCoordinates}
                             title={route.params.user.name}
-                            image={{ uri: route.params.user.photo }}
+                            style={styles.passengerPhoto}
                             description={displayPickupAddress}
                         />
 
@@ -218,7 +211,14 @@ const MapScreen = () => {
                 )}
                 <TouchableOpacity
                     style={isTripStarted ? styles.finishTripButton : styles.startTripButton}
-                    onPress={() => setIsTripStarted(!isTripStarted)}>
+                    onPress={() => {
+                        if (!isTripStarted) {
+                            handleInitTrip()
+                        } else {
+                            handleFinishTrip()
+                        }
+                        setIsTripStarted(!isTripStarted)
+                    }}>
                     <Text style={styles.buttonText}>
                         {isTripStarted ? 'Finalizar Viagem' : 'Iniciar Viagem'}
                     </Text>
