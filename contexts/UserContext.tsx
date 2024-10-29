@@ -4,21 +4,10 @@ import React, { createContext, useState } from 'react';
 import { RouteList } from '../utils/stackParamRouteList';
 type User = {
     id: number;
-    type: 'Driver';
+    type: 'passenger' | 'driver';
     username: string;
     email: string;
-    fullName: string;
-    photo?: string;
-    birthDate: string;
-    cpf: string;
-    carModel: string;
-    licensePlate: string;
-} | {
-    id: number;
-    type: 'Passenger';
-    username: string;
-    email: string;
-    fullName: string;
+    nome: string;
     photo?: string;
     birthDate: string;
     cpf: string;
@@ -45,8 +34,8 @@ export const UserProvider = ({ children }: {
     // Função para logar o  usuário
     const login = (userData: User) => {
         setUser(userData);
-        if (userData.type == 'Driver') navigation.navigate('driver');
-        if (userData.type == 'Passenger') navigation.navigate('passenger')
+        if (userData.type == 'driver') navigation.navigate('driver');
+        if (userData.type == 'passenger') navigation.navigate('passenger')
     };
 
     // Função para deslogar o usuário

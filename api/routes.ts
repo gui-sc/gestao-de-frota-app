@@ -22,7 +22,7 @@ export const getByRange = async (lat: number, long: number, radius: number) => {
     })
 }
 
-export const getLastTravels = async (id: string, type: 'driver' | 'passenger') => {
+export const getLastTravels = async (id: number, type: 'driver' | 'passenger') => {
     return api.get(`/travel/last/${type}/${id}`).then(response => {
         return response.data
     }).catch(error => {
@@ -30,7 +30,7 @@ export const getLastTravels = async (id: string, type: 'driver' | 'passenger') =
     })
 }
 
-export const getTravelById = async (id: string) => {
+export const getTravelById = async (id: number) => {
     return api.get(`/travel/${id}`).then(response => {
         return response.data
     }).catch(error => {
@@ -38,7 +38,7 @@ export const getTravelById = async (id: string) => {
     })
 }
 
-export const acceptTravel = async (id: string, driverId: string) => {
+export const acceptTravel = async (id: number, driverId: number) => {
     return api.put(`/travel/${id}`, { driverId }).then(response => {
         return response.data
     }).catch(error => {
@@ -46,7 +46,7 @@ export const acceptTravel = async (id: string, driverId: string) => {
     })
 }
 
-export const cancelTravel = async (id: string) => {
+export const cancelTravel = async (id: number) => {
     return api.delete(`/travel/${id}`).then(response => {
         return response.data
     }).catch(error => {
@@ -78,7 +78,7 @@ export const createChat = async (driver: string, passenger: string) => {
     })
 }
 
-export const getChat = async (id: string) => {
+export const getChat = async (id: number) => {
     return api.get(`/chat/${id}`).then(response => {
         return response.data
     }).catch(error => {
@@ -86,7 +86,7 @@ export const getChat = async (id: string) => {
     })
 }
 
-export const sendMessage = async (id: string, message: string, user: number) => {
+export const sendMessage = async (id: number, message: string, user: number) => {
     return api.post(`/chat/message/${id}`, { content: message, sender: user }).then(response => {
         return response.data
     }).catch(error => {
@@ -102,7 +102,7 @@ export const getMessages = async (id: number) => {
     })
 }
 
-export const getChatByPassenger = async (id: string) => {
+export const getChatByPassenger = async (id: number) => {
     return api.get(`/chat/passenger/${id}`).then(response => {
         return response.data
     }).catch(error => {
@@ -110,7 +110,7 @@ export const getChatByPassenger = async (id: string) => {
     })
 }
 
-export const getChatByDriver = async (id: string) => {
+export const getChatByDriver = async (id: number) => {
     return api.get(`/chat/driver/${id}`).then(response => {
         return response.data
     }).catch(error => {
@@ -118,7 +118,7 @@ export const getChatByDriver = async (id: string) => {
     })
 }
 
-export const getImportantDates = async (id: string) => {
+export const getImportantDates = async (id: number) => {
     return api.get(`/dates/${id}`).then(response => {
         return response.data
     }).catch(error => {
@@ -146,6 +146,18 @@ export const getTripDriver = async (id: number) => {
     return api.get(`/travel/driver/${id}`).then(response => {
         return response.data
     }).catch(error => {
+        throw error
+    })
+}
+
+export const loginApp = async (email: string, senha: string) => {
+    return api.post('/user/login/app', { email, senha }).then(response => {
+        console.log('response', response.data)
+        return response.data
+    }).catch(error => {
+        if (error.response.status === 401) {
+            return { error: 'Usuário ou senha inválidos' }
+        }
         throw error
     })
 }

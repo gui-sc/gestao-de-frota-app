@@ -1,42 +1,29 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Keyboard, Image } from 'react-native';
 import { UserContext } from '../contexts/UserContext';
+import LoadingIndicator from '../components/Loading';
 import toastHelper from '@/utils/toast';
+import { loginApp } from '../api/routes';
 
 export default function LoginScreen() {
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const { login, user } = useContext(UserContext);
 
   const handleLogin = () => {
-    if (email.split("@")[0].toLowerCase() == 'driver') {
-      login({
-        id: 3,
-        type: 'Driver',
-        username: email.split("@")[0],
-        email,
-        fullName: email.split("@")[0],
-        birthDate: '1990-07-01T14:20:00Z',
-        cpf: '12345678900',
-        carModel: 'Civic',
-        licensePlate: 'ABC1234',
-        photo: 'https://randomuser.me/api/portraits/men/1.jpg',
-      });
-
-    } else {
-      console.log('logando passenger')
-      login({
-        id: 1,
-        type: 'Passenger',
-        username: email.split("@")[0],
-        email,
-        fullName: email.split("@")[0],
-        birthDate: '1990-07-01T14:20:00Z',
-        cpf: '12345678900',
-        photo: 'https://randomuser.me/api/portraits/men/1.jpg',
-      })
-    }
+    setLoading(true);
+    loginApp(email, password).then(response => {
+      if(response.error){
+        toastHelper.error('Credenciais Incorretas', response.error.message);
+        return
+      }
+      login(response);
+    }).catch(error => {
+      console.log('error', error)
+      toastHelper.error('Erro ao realizar login', 'error');
+    }).finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -45,6 +32,8 @@ export default function LoginScreen() {
       toastHelper.success('Login realizado com sucesso!', 'success');
     }
   }, [user]);
+
+  if (loading) return <LoadingIndicator />;
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

@@ -60,9 +60,9 @@ const PendingTrip = () => {
 
     useEffect(() => {
         if (user) {
-            setRole(user.type === 'Driver' ? 'driver' : 'passenger')
-            setIsDriverAssigned(user.type === 'Driver')
-            setOtherUserInfo(user.type === 'Driver' ? passenger : null)
+            setRole(user.type === 'driver' ? 'driver' : 'passenger')
+            setIsDriverAssigned(user.type === 'driver')
+            setOtherUserInfo(user.type === 'driver' ? passenger : null)
         }
     }, [user])
 

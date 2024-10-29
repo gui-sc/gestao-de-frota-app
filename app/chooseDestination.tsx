@@ -251,7 +251,7 @@ const chooseDestination = () => {
                                     {'Solicitar Viagem'}
                                 </Text>
                                 <Text style={styles.buttonText}>
-                                    {`Valor: R$ ${calculateDistance()! * 0.00001 + 2.5}`}
+                                    {`Valor: R$ ${(calculateDistance()! * 0.0001 + 2.5).toFixed(2)}`}
                                 </Text>
                             </TouchableOpacity>
                         </View>

@@ -13,8 +13,11 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) {
+      return navigation.navigate('index');
+    }
     setLoading(true);
-    getLastTravels('1', 'passenger').then((trips) => {
+    getLastTravels(user.id, 'passenger').then((trips) => {
       setTrips(trips);
     }).catch(err => console.log(err)).finally(() => setLoading(false));
   }, []);

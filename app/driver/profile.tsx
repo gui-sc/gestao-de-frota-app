@@ -26,12 +26,12 @@ export default function TabFourScreen() {
                         style={styles.image}
                         resizeMode='contain'
                     />
-                    <Text style={styles.header}>{user?.fullName}</Text>
+                    <Text style={styles.header}>{user?.nome}</Text>
                 </View>
 
                 <View style={styles.infoContainer}>
                     <Text style={styles.label}>Nome Completo</Text>
-                    <Text style={styles.info}>{user?.fullName}</Text>
+                    <Text style={styles.info}>{user?.nome}</Text>
                 </View>
 
                 <View style={styles.infoContainer}>
@@ -48,18 +48,7 @@ export default function TabFourScreen() {
                     <Text style={styles.label}>E-mail</Text>
                     <Text style={styles.info}>{user?.email}</Text>
                 </View>
-                {user?.type === 'Driver' && <>
-                    <View style={styles.infoContainer}>
-                        <Text style={styles.label}>Carro</Text>
-                        <Text style={styles.info}>{user?.carModel}</Text>
-                    </View>
 
-                    <View style={styles.infoContainer}>
-                        <Text style={styles.label}>Placa</Text>
-                        <Text style={styles.info}>{user?.licensePlate}</Text>
-                    </View>
-                </>
-                }
                 <InputPicture showFile={false} onChange={setFoto} />
                 <TouchableOpacity onPress={logout} style={styles.button}>
                     <Text style={styles.buttonText}>Sair</Text>

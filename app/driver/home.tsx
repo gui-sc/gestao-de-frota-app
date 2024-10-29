@@ -16,12 +16,15 @@ export default function HomeScreen() {
 
   useEffect(() => {
     setLoading(true);
+    if (!user) {
+      return;
+    }
     Promise.all([
-      getLastTravels('3', 'driver').then((trips) => {
+      getLastTravels(user.id, 'driver').then((trips) => {
         console.log("trips", trips);
         setTrips(trips);
       }).catch(err => console.log("err in trips", err)),
-      getImportantDates('3').then((dates) => {
+      getImportantDates(user.id).then((dates) => {
         console.log("dates", dates);
         setImportantDates(dates);
       }).catch(err => console.log("err in dates", err))
@@ -30,7 +33,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     console.log('user', user)
-    if (!user || user.type !== 'Driver') {
+    if (!user || user.type !== 'driver') {
       return navigation.navigate('index');
     }
   }, [])
@@ -42,7 +45,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.header}>Olá, Motorista!</Text>
+        <Text style={styles.header}>Olá, {user?.nome}!</Text>
 
         <Text style={styles.sectionTitle}>Últimas Viagens</Text>
         <FlatList

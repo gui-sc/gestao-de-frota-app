@@ -34,7 +34,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }} initialRouteName={'index'}>
           <Stack.Screen name="index"
             options={{ headerShown: false }} />
-          {user?.type === 'Driver' ? (
+          {user?.type === 'driver' ? (
             <Stack.Screen name="driver" options={{ headerShown: false }} />
           ) : (
             <Stack.Screen name="passenger" options={{ headerShown: false }} />

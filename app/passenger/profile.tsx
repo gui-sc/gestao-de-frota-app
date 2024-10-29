@@ -20,12 +20,12 @@ export default function TabFourScreen() {
                         style={styles.image}
                         resizeMode='contain'
                     />
-                    <Text style={styles.header}>{user?.fullName}</Text>
+                    <Text style={styles.header}>{user?.nome}</Text>
                 </View>
 
                 <View style={styles.infoContainer}>
                     <Text style={styles.label}>Nome Completo</Text>
-                    <Text style={styles.info}>{user?.fullName}</Text>
+                    <Text style={styles.info}>{user?.nome}</Text>
                 </View>
 
                 <View style={styles.infoContainer}>

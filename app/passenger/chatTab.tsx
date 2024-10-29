@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, SafeAreaView } from 'react-native';
 import UnreadBadge from '../../components/UnreadBadge';
 import dayjs from 'dayjs';
@@ -6,6 +6,7 @@ import { useNavigation } from 'expo-router';
 import { RouteList } from '../../utils/stackParamRouteList';
 import { getChatByPassenger } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
+import { UserContext } from '../../contexts/UserContext';
 
 interface Chat {
   chat_id: number;
@@ -18,17 +19,21 @@ interface Chat {
   last_message_time: dayjs.Dayjs; // Ex.: '15:30'
 }
 export default function ChatTabScreen() {
+  const { user } = useContext(UserContext);
   const [chats, setChats] = useState([])
   const [loading, setLoading] = useState(true);
 
+  const navigation = useNavigation<RouteList>();
   useEffect(() => {
+    if (!user) {
+      return navigation.navigate('index');
+    }
     setLoading(true);
-    getChatByPassenger('2').then((chats) => {
+    getChatByPassenger(user.id).then((chats) => {
       console.log("chats", chats);
       setChats(chats);
     }).finally(() => setLoading(false));
   }, []);
-  const navigation = useNavigation<RouteList>();
 
   if (loading) return <LoadingIndicator />;
 
