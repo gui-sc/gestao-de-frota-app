@@ -130,7 +130,7 @@ const chooseDestination = () => {
                 tripId: res.id,
                 destinationCoordinates,
                 passenger: {
-                    name: user.fullName,
+                    name: user.nome,
                     avatar: user.photo,
                 },
                 pickupCoordinates: location,

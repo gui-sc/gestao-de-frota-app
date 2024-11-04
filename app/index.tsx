@@ -1,21 +1,25 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Keyboard, Image } from 'react-native';
+import { View, TextInput, Button, StyleSheet, TouchableWithoutFeedback, Keyboard, Image, Modal, TouchableOpacity, Text } from 'react-native';
 import { UserContext } from '../contexts/UserContext';
 import LoadingIndicator from '../components/Loading';
 import toastHelper from '@/utils/toast';
 import { loginApp } from '../api/routes';
+import { useNavigation } from 'expo-router';
+import { RouteList } from '../utils/stackParamRouteList';
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation<RouteList>();
 
   const { login, user } = useContext(UserContext);
 
   const handleLogin = () => {
     setLoading(true);
     loginApp(email, password).then(response => {
-      if(response.error){
+      if (response.error) {
         toastHelper.error('Credenciais Incorretas', response.error.message);
         return
       }
@@ -33,6 +37,18 @@ export default function LoginScreen() {
     }
   }, [user]);
 
+  const openModal = () => setModalVisible(true);
+  const closeModal = () => setModalVisible(false);
+
+  const navigateToPassengerRegistration = () => {
+    closeModal();
+    navigation.navigate('passengerRegistration');
+  };
+
+  const navigateToDriverRegistration = () => {
+    closeModal();
+    navigation.navigate('driverRegistration');
+  };
   if (loading) return <LoadingIndicator />;
 
   return (
@@ -60,6 +76,35 @@ export default function LoginScreen() {
           secureTextEntry
         />
         <Button title="Entrar" onPress={handleLogin} color="#44EAC3" />
+        {/* Botão para criar nova conta */}
+        <TouchableOpacity onPress={openModal} style={styles.createAccountButton}>
+          <Text style={styles.createAccountText}>Criar Nova Conta</Text>
+        </TouchableOpacity>
+
+        {/* Modal de seleção */}
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Selecione o tipo de conta</Text>
+              <Button
+                title="Passageiro"
+                onPress={navigateToPassengerRegistration}
+                color="#44EAC3"
+              />
+              <Button
+                title="Motorista"
+                onPress={navigateToDriverRegistration}
+                color="#44EAC3"
+              />
+              <Button title="Cancelar" onPress={closeModal} color="#FF4444" />
+            </View>
+          </View>
+        </Modal>
       </View>
 
     </TouchableWithoutFeedback>
@@ -90,5 +135,31 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     alignSelf: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  modalContent: {
+    backgroundColor: '#222',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    color: '#44EAC3',
+    marginBottom: 20,
+  },
+  createAccountButton: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  createAccountText: {
+    color: '#44EAC3',
+    fontSize: 16,
   },
 });

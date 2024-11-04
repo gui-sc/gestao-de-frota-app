@@ -38,6 +38,8 @@ export type RootStackParamList = {
         };
         routeId: number;
     };
+    driverRegistration: undefined;
+    passengerRegistration: undefined;
 };
 
 export type RouteList = StackNavigationProp<RootStackParamList>

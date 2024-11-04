@@ -16,7 +16,7 @@ interface Chat {
   avatar: string;
   lastMessage: string;
   unread_count: number;
-  last_message_time: dayjs.Dayjs; // Ex.: '15:30'
+  last_message_time: dayjs.Dayjs;
 }
 
 export default function ChatTabScreen() {
