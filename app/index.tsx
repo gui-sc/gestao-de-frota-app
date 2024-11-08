@@ -61,7 +61,7 @@ export default function LoginScreen() {
           style={[styles.input, {
             marginTop: 50
           }]}
-          placeholder="Digite seu e-mail"
+          placeholder="Digite seu e-mail, telefone ou CPF"
           placeholderTextColor="#ccc"
           value={email}
           onChangeText={setEmail}
