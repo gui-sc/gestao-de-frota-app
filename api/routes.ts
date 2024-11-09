@@ -150,8 +150,8 @@ export const getTripDriver = async (id: number) => {
     })
 }
 
-export const loginApp = async (login: string, senha: string) => {
-    return api.post('/user/login/app', { login, senha }).then(response => {
+export const loginApp = async (login: string, password: string) => {
+    return api.post('/user/login/app', { login, password }).then(response => {
         console.log('response', response.data)
         return response.data
     }).catch(error => {

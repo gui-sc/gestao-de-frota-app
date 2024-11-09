@@ -45,7 +45,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.header}>Olá, {user?.nome}!</Text>
+        <Text style={styles.header}>Olá, {user?.name}!</Text>
 
         <Text style={styles.sectionTitle}>Últimas Viagens</Text>
         <FlatList

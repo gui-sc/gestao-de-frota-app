@@ -33,7 +33,7 @@ export default function ChatScreen() {
             return navigation.navigate('index');
         }
         if (newMessage.trim()) {
-            sendMessage(chatId.toString(), newMessage, user.id).then(() => {
+            sendMessage(chatId, newMessage, user.id).then(() => {
                 console.log("message sent");
                 getMessagesAsync();
             }).catch(err => console.log(err));

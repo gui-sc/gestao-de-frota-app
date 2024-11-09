@@ -8,8 +8,8 @@ import dayjs from 'dayjs';
 
 export default function TabFourScreen() {
     const { user, logout } = useContext(UserContext);
-    const [dataNascimento, setDataNascimento] = useState<dayjs.Dayjs | null>(dayjs(user?.birthDate ?? '1990-07-01T14:20:00Z'));
-    const [foto, setFoto] = useState<string>(user?.photo || 'https://randomuser.me/api/portraits/men/1.jpg');
+    const [dataNascimento, setDataNascimento] = useState<dayjs.Dayjs | null>(dayjs(user?.birth_date));
+    const [foto, setFoto] = useState<string>(user?.avatar || 'https://randomuser.me/api/portraits/men/1.jpg');
 
     useEffect(()=>{
         if(user){
@@ -26,12 +26,12 @@ export default function TabFourScreen() {
                         style={styles.image}
                         resizeMode='contain'
                     />
-                    <Text style={styles.header}>{user?.nome}</Text>
+                    <Text style={styles.header}>{user?.name}</Text>
                 </View>
 
                 <View style={styles.infoContainer}>
                     <Text style={styles.label}>Nome Completo</Text>
-                    <Text style={styles.info}>{user?.nome}</Text>
+                    <Text style={styles.info}>{user?.name} {user?.last_name}</Text>
                 </View>
 
                 <View style={styles.infoContainer}>

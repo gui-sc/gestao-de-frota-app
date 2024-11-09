@@ -172,7 +172,7 @@ const MapScreen = () => {
                     {/* Marcadores */}
                     <Marker coordinate={location}
                         title="Sua localização"
-                        image={user?.photo ? { uri: user.photo } : undefined}
+                        image={user?.avatar ? { uri: user.avatar } : undefined}
                         description={displayCurrentAddress}
                     />
                     {!isTripStarted && (

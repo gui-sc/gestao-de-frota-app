@@ -40,6 +40,7 @@ export type RootStackParamList = {
     };
     driverRegistration: undefined;
     passengerRegistration: undefined;
+    pendingApproval: undefined;
 };
 
 export type RouteList = StackNavigationProp<RootStackParamList>

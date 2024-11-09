@@ -5,12 +5,14 @@ import { RouteList } from '../utils/stackParamRouteList';
 type User = {
     id: number;
     type: 'passenger' | 'driver';
-    username: string;
     email: string;
-    nome: string;
-    photo?: string;
-    birthDate: string;
+    name: string;
+    last_name: string;
+    birth_date: string;
     cpf: string;
+    phone: string;
+    active: boolean;
+    avatar?: string;
 };
 
 
@@ -34,6 +36,10 @@ export const UserProvider = ({ children }: {
     // Função para logar o  usuário
     const login = (userData: User) => {
         setUser(userData);
+        if (userData.active === false) {
+            navigation.navigate('pendingApproval');
+            return;
+        }
         if (userData.type == 'driver') navigation.navigate('driver');
         if (userData.type == 'passenger') navigation.navigate('passenger')
     };

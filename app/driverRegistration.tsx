@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, TouchableOpacity, Text, Image, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import CarBrandPicker from '../components/CarBrandModelSelector';
+import { RouteList } from '../utils/stackParamRouteList';
+import { useNavigation } from '@react-navigation/native';
 
 export default function DriverRegistrationScreen() {
     const [step, setStep] = useState(1);
     // Etapa 1
     const [name, setName] = useState('');
+    const navigation = useNavigation<RouteList>();
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [cpf, setCpf] = useState('');
@@ -25,6 +28,8 @@ export default function DriverRegistrationScreen() {
     const [year, setYear] = useState('');
     const [plate, setPlate] = useState('');
     const [renavam, setRenavam] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [vehiclePhotos, setVehiclePhotos] = useState<string[]>([]);
 
     const pickImage = async (setter: (uri: string | null) => void) => {
@@ -54,6 +59,7 @@ export default function DriverRegistrationScreen() {
     const handleNextStep = () => setStep(2);
     const handleRegister = () => {
         // Lógica de cadastro
+        navigation.navigate('pendingApproval');
     };
 
     return (
@@ -92,6 +98,23 @@ export default function DriverRegistrationScreen() {
                                 placeholderTextColor="#ccc"
                                 value={cpf}
                                 onChangeText={setCpf}
+                            />
+
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Digite sua senha"
+                                placeholderTextColor="#ccc"
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Confirme sua senha"
+                                placeholderTextColor="#ccc"
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
+                                secureTextEntry
                             />
                             <View style={styles.photoContainer}>
                                 <TouchableOpacity onPress={() => pickImage(setDocumentPhoto)}>

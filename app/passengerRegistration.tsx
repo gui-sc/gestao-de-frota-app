@@ -6,6 +6,8 @@ import * as ImagePicker from 'expo-image-picker';
 export default function PassengerRegistrationScreen() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [phone, setPhone] = useState('');
     const [cpf, setCpf] = useState('');
     const [photo, setPhoto] = useState<string | null | undefined>(null);
@@ -18,7 +20,7 @@ export default function PassengerRegistrationScreen() {
             quality: 1,
         });
         if (!result.canceled) {
-            
+
             setPhoto(result.assets[0].uri);
         }
     };
@@ -52,6 +54,7 @@ export default function PassengerRegistrationScreen() {
                 value={email}
                 onChangeText={setEmail}
             />
+
             <TextInput
                 style={styles.input}
                 placeholder="Telefone"
@@ -65,6 +68,23 @@ export default function PassengerRegistrationScreen() {
                 placeholderTextColor="#ccc"
                 value={cpf}
                 onChangeText={setCpf}
+            />
+
+            <TextInput
+                style={styles.input}
+                placeholder="Digite sua senha"
+                placeholderTextColor="#ccc"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Confirme sua senha"
+                placeholderTextColor="#ccc"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
             />
             <Button title="Cadastrar" onPress={handleRegister} color="#44EAC3" />
         </View>
