@@ -4,6 +4,9 @@ import * as ImagePicker from 'expo-image-picker';
 import CarBrandPicker from '../components/CarBrandModelSelector';
 import { RouteList } from '../utils/stackParamRouteList';
 import { useNavigation } from '@react-navigation/native';
+import { createDriver, createVehicle } from '../api/routes';
+import { maskToDate } from '../utils/mask';
+import toastHelper from '../utils/toast';
 
 export default function DriverRegistrationScreen() {
     const [step, setStep] = useState(1);
@@ -13,8 +16,10 @@ export default function DriverRegistrationScreen() {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [cpf, setCpf] = useState('');
+    const [birthDate, setBirthDate] = useState<string>('');
     const [documentPhoto, setDocumentPhoto] = useState<string | null>(null);
     const [holdingDocumentPhoto, setHoldingDocumentPhoto] = useState<string | null>(null);
+    const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
     // Etapa 2
     const [cnh, setCnh] = useState('');
     const [brand, setBrand] = useState<{
@@ -26,6 +31,7 @@ export default function DriverRegistrationScreen() {
         nome: string;
     } | null>(null);
     const [year, setYear] = useState('');
+    const [color, setColor] = useState('');
     const [plate, setPlate] = useState('');
     const [renavam, setRenavam] = useState('');
     const [password, setPassword] = useState('');
@@ -57,9 +63,67 @@ export default function DriverRegistrationScreen() {
     };
 
     const handleNextStep = () => setStep(2);
-    const handleRegister = () => {
-        // Lógica de cadastro
-        navigation.navigate('pendingApproval');
+    const handleRegisterDriver = async () => {
+        const formData = new FormData();
+        console.log('brand', brand)
+        console.log('model', model)
+        const newBirthDate = birthDate.split('/').reverse().join('-');
+        console.log('newBirthDate', newBirthDate)
+        // Adiciona os dados textuais ao FormData
+        formData.append('name', name.split(' ')[0]);
+        formData.append('last_name', name.split(' ').slice(1).join(' '));
+        formData.append('email', email);
+        formData.append('birth_date', newBirthDate);
+        formData.append('type', 'driver');
+        formData.append('phone', phone);
+        formData.append('cpf', cpf);
+        formData.append('cnh', cnh);
+        formData.append('password', password);
+        //ajusta o type conforme o tipo de arquivo
+        formData.append('cnh_picture', {
+            uri: documentPhoto,
+            name: `documentPhoto.${documentPhoto?.split('.').pop()}`,
+            type: `image/${documentPhoto?.split('.').pop()}`
+        } as any)
+        formData.append('profile_doc_picture', {
+            uri: holdingDocumentPhoto,
+            name: `holdingDocumentPhoto.${holdingDocumentPhoto?.split('.').pop()}`,
+            type: `image/${holdingDocumentPhoto?.split('.').pop()}`
+        } as any)
+        formData.append('profile_picture', {
+            uri: profilePhoto,
+            name: `profilePhoto.${profilePhoto?.split('.').pop()}`,
+            type: `image/${profilePhoto?.split('.').pop()}`
+        } as any)
+        console.log('formData1', formData)
+
+        const res = await createDriver(formData)
+        handleRegisterVehicle(7)
+    };
+
+    const handleRegisterVehicle = async (id: number | string) => {
+        const formData = new FormData();
+        if (!brand || !model) {
+            toastHelper.error('Preencha todos os campos!', 'Selecione a marca e modelo do veículo');
+            return;
+        }
+        formData.append('modelo', `${brand?.nome}-${model?.nome}`);
+        formData.append('ano', year);
+        formData.append('placa', plate);
+        formData.append('renavam', renavam);
+        formData.append('cor', color);
+        formData.append('driverId', id.toString());
+
+
+        for (let i = 0; i < vehiclePhotos.length; i++) {
+            formData.append(`pictures`, {
+                uri: vehiclePhotos[i],
+                name: `vehiclePhoto_${i}.${vehiclePhotos[i].split('.').pop()}`,
+                type: `image/${vehiclePhotos[i].split('.').pop()}`
+            } as any)
+        }
+
+        await createVehicle(formData)
     };
 
     return (
@@ -99,6 +163,13 @@ export default function DriverRegistrationScreen() {
                                 value={cpf}
                                 onChangeText={setCpf}
                             />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Data de Nascimento"
+                                placeholderTextColor="#ccc"
+                                value={birthDate}
+                                onChangeText={(date: string) => setBirthDate(maskToDate(date))}
+                            />
 
                             <TextInput
                                 style={styles.input}
@@ -117,6 +188,15 @@ export default function DriverRegistrationScreen() {
                                 secureTextEntry
                             />
                             <View style={styles.photoContainer}>
+                                <TouchableOpacity onPress={() => pickImage(setProfilePhoto)}>
+                                    {profilePhoto ? (
+                                        <Image source={{ uri: profilePhoto }} style={styles.photo} />
+                                    ) : (
+                                        <View style={styles.photoPlaceholder}>
+                                            <Text style={styles.photoText}>Foto de Perfil</Text>
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
                                 <TouchableOpacity onPress={() => pickImage(setDocumentPhoto)}>
                                     {documentPhoto ? (
                                         <Image source={{ uri: documentPhoto }} style={styles.photo} />
@@ -160,6 +240,13 @@ export default function DriverRegistrationScreen() {
                             />
                             <TextInput
                                 style={styles.input}
+                                placeholder="Cor"
+                                placeholderTextColor="#ccc"
+                                value={color}
+                                onChangeText={setColor}
+                            />
+                            <TextInput
+                                style={styles.input}
                                 placeholder="Placa"
                                 placeholderTextColor="#ccc"
                                 value={plate}
@@ -182,7 +269,7 @@ export default function DriverRegistrationScreen() {
                                     <Image key={index} source={{ uri }} style={styles.photo} />
                                 ))}
                             </View>
-                            <Button title="Cadastrar" onPress={handleRegister} color="#44EAC3" />
+                            <Button title="Cadastrar" onPress={handleRegisterDriver} color="#44EAC3" />
                         </>
                     )}
                 </ScrollView>
