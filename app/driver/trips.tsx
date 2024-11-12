@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
-import { UserContext } from '../../contexts/UserContext';
 import TripDetailsModal from '../../components/TripDetailsModal'; // Importando o modal
 import { Trip } from '@/types/trip';
 import { getByRange } from '../../api/routes';
@@ -9,7 +8,6 @@ import toastHelper from '../../utils/toast';
 import LoadingIndicator from '../../components/Loading';
 
 export default function HomeScreen() {
-  const { user } = useContext(UserContext);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [radius, setRadius] = useState<number>(2);
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -18,38 +16,7 @@ export default function HomeScreen() {
     latitude: number;
     longitude: number;
   } | null>(null);
-  // const trips = [
-  //   {
-  //     id: '1',
-  //     passengerName: 'Carlos Silva',
-  //     passengerPhoto: 'https://randomuser.me/api/portraits/men/1.jpg',
-  //     distanceToPickup: '2 km',
-  //     totalDistance: '10 km',
-  //     fare: 'R$ 30,00',
-  //     pickupCoordinates: { latitude: -22.9068, longitude: -43.1729 },
-  //     dropoffCoordinates: { latitude: -23.5505, longitude: -46.6333 },
-  //   },
-  //   {
-  //     id: '2',
-  //     passengerName: 'Maria Oliveira',
-  //     passengerPhoto: 'https://randomuser.me/api/portraits/women/1.jpg',
-  //     distanceToPickup: '5 km',
-  //     totalDistance: '15 km',
-  //     fare: 'R$ 45,00',
-  //     pickupCoordinates: { latitude: -22.9083, longitude: -43.1964 },
-  //     dropoffCoordinates: { latitude: -22.2916, longitude: -43.6884 },
-  //   },
-  //   {
-  //     id: '3',
-  //     passengerName: 'João Pereira',
-  //     passengerPhoto: 'https://randomuser.me/api/portraits/men/2.jpg',
-  //     distanceToPickup: '3 km',
-  //     totalDistance: '12 km',
-  //     fare: 'R$ 40,00',
-  //     pickupCoordinates: { latitude: -22.9068, longitude: -43.1729 },
-  //     dropoffCoordinates: { latitude: -22.9083, longitude: -43.1964 },
-  //   },
-  // ];
+
   const getCurrentLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -83,15 +50,16 @@ export default function HomeScreen() {
       setLoading(true);
       await getByRange(location.latitude, location.longitude, radius).then(data => {
         setTrips(data.map((trip: any) => {
+          console.log(trip);
           return {
             id: trip.id,
             passengerName: trip.passenger_name,
-            passengerPhoto: trip.passenger_avatar,
+            passengerPhoto: trip.avatar,
             distanceToPickup: (trip.distance / 1000).toFixed(2) + ' km',
             totalDistance: (trip.total_distance / 1000).toFixed(2) + ' km',
             fare: `R$ ${trip.value.toFixed(2).replace('.', ',')}`,
-            pickupCoordinates: { latitude: trip.latitudeorigin, longitude: trip.longitudeorigin },
-            dropoffCoordinates: { latitude: trip.latitudedestination, longitude: trip.longitudedestination },
+            pickupCoordinates: { latitude: trip.latitude_origin, longitude: trip.longitude_origin },
+            dropoffCoordinates: { latitude: trip.latitude_destination, longitude: trip.longitude_destination },
           }
         }))
       }).catch((error) => {

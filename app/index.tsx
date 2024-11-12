@@ -23,7 +23,7 @@ export default function LoginScreen() {
         toastHelper.error('Credenciais Incorretas', response.error.message);
         return
       }
-      login(response);
+      login(response.user, response.activeTravel);
     }).catch(error => {
       console.log('error', error)
       toastHelper.error('Erro ao realizar login', 'error');

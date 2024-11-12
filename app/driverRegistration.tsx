@@ -97,8 +97,13 @@ export default function DriverRegistrationScreen() {
         } as any)
         console.log('formData1', formData)
 
-        const res = await createDriver(formData)
-        handleRegisterVehicle(7)
+        const res = await createDriver(formData).then(res => {
+            console.log('res', res)
+            handleRegisterVehicle(res.id)
+        }).catch(error => {
+            console.log('error', error)
+            toastHelper.error('Erro ao cadastrar motorista', 'Tente novamente mais tarde');
+        });
     };
 
     const handleRegisterVehicle = async (id: number | string) => {
@@ -123,7 +128,12 @@ export default function DriverRegistrationScreen() {
             } as any)
         }
 
-        await createVehicle(formData)
+        await createVehicle(formData).then(response => {
+            navigation.navigate('index');
+        }).catch(error => {
+            console.log('error', error)
+            toastHelper.error('Erro ao cadastrar veículo', 'Tente novamente mais tarde');
+        });
     };
 
     return (

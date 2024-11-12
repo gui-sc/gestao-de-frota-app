@@ -18,7 +18,9 @@ export type RootStackParamList = {
         tripId: number
     };
     chat: {
-        chatId: number
+        chatId: number,
+        passengerName: string,
+        passengerPhoto?: string,
     };
     driver: undefined;
     passenger: undefined;

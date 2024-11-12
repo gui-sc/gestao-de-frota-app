@@ -16,12 +16,16 @@ interface Message {
     timestamp: number;
 }
 
-type ChatScreenRouteProp = RouteProp<{ chat: { chatId: number } }>
+type ChatScreenRouteProp = RouteProp<{ chat: { 
+    chatId: number,
+    passengerName: string,
+    passengerPhoto?: string,
+} }>
 
 export default function ChatScreen() {
     const { user } = useContext(UserContext);
     const route = useRoute<ChatScreenRouteProp>();
-    const { chatId } = route.params;
+    const { chatId, passengerName, passengerPhoto } = route.params;
     const [loading, setLoading] = React.useState(true);
     const [seconds, setSeconds] = React.useState(0);
     const [messages, setMessages] = React.useState<any[]>([]);
@@ -42,7 +46,7 @@ export default function ChatScreen() {
     };
 
     const getMessagesAsync = async () => {
-        console.log("getting messages");
+        console.log("getting messages", chatId);
         getMessages(chatId).then((messages) => {
             console.log("messages", messages);
             setMessages(messages);
@@ -60,6 +64,11 @@ export default function ChatScreen() {
 
     }, [seconds])
 
+    if(!user) {
+        navigation.navigate('index');
+        return
+    }
+
     if (loading) return <LoadingIndicator />;
 
     return (
@@ -70,17 +79,17 @@ export default function ChatScreen() {
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
             >
                 <View style={styles.headerContainer}>
-                    {/* <Image source={{ uri: passengerPhoto }} style={styles.passengerPhoto} /> */}
-                    <Text style={styles.passengerName}>{"passengerName"}</Text>
+                    {passengerPhoto && <Image source={{ uri: passengerPhoto }} style={styles.passengerPhoto} />}
+                    <Text style={styles.passengerName}>{passengerName}</Text>
                 </View>
 
                 <FlatList
                     data={messages}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                        <View style={item.sender === 2 ? styles.myMessage : styles.theirMessage}>
-                            <Text style={item.sender === 2 ? styles.myMessageText : styles.theirMessageText}>{item.content}</Text>
-                            <Text style={item.sender === 2 ? styles.myMessageTime : styles.theirMessageTime}>
+                        <View style={item.sender === user.id ? styles.myMessage : styles.theirMessage}>
+                            <Text style={item.sender === user.id ? styles.myMessageText : styles.theirMessageText}>{item.content}</Text>
+                            <Text style={item.sender === user.id ? styles.myMessageTime : styles.theirMessageTime}>
                                 {dayjs(item.updatedAt).format('HH:mm')}
                             </Text>
                         </View>

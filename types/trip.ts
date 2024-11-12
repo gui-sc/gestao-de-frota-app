@@ -14,10 +14,12 @@ export interface Trip {
     dropoffCoordinates: Coordinates;
 }
 export interface TripRequest {
-    latitudeorigin: number;
-    longitudeorigin: number;
-    latitudedestination: number;
-    longitudedestination: number;
+    latitude_origin: number;
+    longitude_origin: number;
+    latitude_destination: number;
+    longitude_destination: number;
+    actual_latitude_passenger: number;
+    actual_longitude_passenger: number;
     passenger: number;
     driver?: number;
     value: number;

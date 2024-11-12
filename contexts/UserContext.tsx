@@ -15,11 +15,27 @@ type User = {
     avatar?: string;
 };
 
+type ActiveTravel = {
+    pickupCoordinates: {
+        latitude: number;
+        longitude: number;
+    };
+    dropoffCoordinates: {
+        latitude: number;
+        longitude: number;
+    };
+    passenger: {
+        name: string;
+        avatar?: string;
+    };
+    tripId: number
+}
 
 // Cria o contexto
 export const UserContext = createContext<{
     user: User | null;
-    login: (userData: User) => void;
+    login: (userData: User, activeTravel: ActiveTravel | undefined) => void;
+
     logout: () => void;
 }>({
     user: null,
@@ -34,10 +50,19 @@ export const UserProvider = ({ children }: {
     const [user, setUser] = useState<User | null>(null);
     const navigation = useNavigation<RouteList>();
     // Função para logar o  usuário
-    const login = (userData: User) => {
+    const login = (userData: User, activeTravel: ActiveTravel | undefined) => {
         setUser(userData);
         if (userData.active === false) {
             navigation.navigate('pendingApproval');
+            return;
+        }
+        if (activeTravel) {
+            navigation.navigate('pendingTrip', {
+                pickupCoordinates: activeTravel.pickupCoordinates,
+                destinationCoordinates: activeTravel.dropoffCoordinates,
+                passenger: activeTravel.passenger,
+                tripId: activeTravel.tripId
+            });
             return;
         }
         if (userData.type == 'driver') navigation.navigate('driver');

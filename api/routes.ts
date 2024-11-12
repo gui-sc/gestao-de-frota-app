@@ -43,7 +43,7 @@ export const getTravelById = async (id: number) => {
 }
 
 export const acceptTravel = async (id: number, driverId: number) => {
-    return api.put(`/travel/${id}`, { driverId }).then(response => {
+    return api.put(`/travel/${id}/accept`, { driverId }).then(response => {
         return response.data
     }).catch(error => {
         console.log('error', error.response.data)
@@ -80,6 +80,15 @@ export const initTravel = async (id: number) => {
 
 export const createChat = async (driver: string, passenger: string) => {
     return api.post('/chat', { driver, passenger }).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error.response.data)
+        throw error
+    })
+}
+
+export const getChatByTravel = async (id: number) => {
+    return api.get(`/chat/travel/${id}`).then(response => {
         return response.data
     }).catch(error => {
         console.log('error', error.response.data)
@@ -168,6 +177,15 @@ export const getTripDriver = async (id: number) => {
     })
 }
 
+export const getActiveTravel = async (id: number, type: 'driver' | 'passenger') => {
+    return api.get(`/travel/active/${type}/${id}`).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error.response.data)
+        throw error
+    })
+}
+
 export const loginApp = async (login: string, password: string) => {
     return api.post('/user/login/app', { login, password }).then(response => {
         console.log('response', response.data)
@@ -177,6 +195,19 @@ export const loginApp = async (login: string, password: string) => {
         if (error.response.status === 401) {
             return { error: 'Usuário ou senha inválidos' }
         }
+        throw error
+    })
+}
+
+export const createUser = async (data: FormData) => {
+    return api.post('/user', data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error.response.data)
         throw error
     })
 }

@@ -1,9 +1,12 @@
 import { Trip } from '@/types/trip';
 import { useNavigation } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, Button, Modal, StyleSheet, Image } from 'react-native';
 import { RouteList } from '../utils/stackParamRouteList';
 import { API_KEY } from '../constants/Env';
+import { acceptTravel } from '../api/routes';
+import { UserContext } from '../contexts/UserContext';
+import toastHelper from '../utils/toast';
 
 const TripDetailsModal = ({
     visible,
@@ -15,17 +18,24 @@ const TripDetailsModal = ({
     onClose: () => void
 }) => {
     const navigation = useNavigation<RouteList>();
-    if (!trip) return null;
 
-    const handleAcceptTrip = () => {
-        navigation.navigate('pendingTrip', {
-            tripId: trip.id,
-            pickupCoordinates: trip.pickupCoordinates,
-            destinationCoordinates: trip.dropoffCoordinates,
-            passenger: {
-                name: trip.passengerName,
-                avatar: trip.passengerPhoto,
-            } 
+    const { user } = useContext(UserContext);
+    if (!trip || !user) return null;
+
+    const handleAcceptTrip = async () => {
+        await acceptTravel(trip.id, user.id).then(() => {
+            navigation.navigate('pendingTrip', {
+                tripId: trip.id,
+                pickupCoordinates: trip.pickupCoordinates,
+                destinationCoordinates: trip.dropoffCoordinates,
+                passenger: {
+                    name: trip.passengerName,
+                    avatar: trip.passengerPhoto,
+                }
+            });
+        }).catch(err => {
+            console.log('error', err);
+            toastHelper.error('Erro ao aceitar viagem', 'Tente novamente mais tarde');
         });
         onClose();
     }

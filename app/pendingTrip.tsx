@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { API_KEY } from '../constants/Env';
 import MapViewDirections from 'react-native-maps-directions';
-import { updateLocation, getLocation, getTripDriver, initTravel, finishTravel } from '../api/routes';
+import { updateLocation, getLocation, getTripDriver, initTravel, finishTravel, getChatByTravel } from '../api/routes';
 import LoadingIndicator from '../components/Loading';
 import { RouteList } from '../utils/stackParamRouteList';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -46,6 +46,7 @@ const PendingTrip = () => {
     const [otherUserInfo, setOtherUserInfo] = useState<{ name: string; avatar?: string } | null>(null);
     const navigation = useNavigation<RouteList>();
     const [messageSearch, setMessageSearch] = useState('Procurando motorista');
+    const [chatId, setChatId] = useState(0);
 
     useEffect(() => {
         if (isTripStarted) {
@@ -60,9 +61,12 @@ const PendingTrip = () => {
 
     useEffect(() => {
         if (user) {
+            console.log('User:', user);
             setRole(user.type === 'driver' ? 'driver' : 'passenger')
             setIsDriverAssigned(user.type === 'driver')
             setOtherUserInfo(user.type === 'driver' ? passenger : null)
+            setOtherLocation(user.type === 'driver' ? pickupCoordinates : null)
+            console.log(passenger)
         }
     }, [user])
 
@@ -79,6 +83,13 @@ const PendingTrip = () => {
     })
 
     useEffect(() => {
+        getChatByTravel(3).then((chat) => {
+            setChatId(3);
+            console.log('Chat:', chat.id);
+        }).catch((err) => {
+            console.error('Erro ao buscar chat:', err);
+            toastHelper.error('Erro ao buscar chat', 'Tente novamente mais tarde');
+        });
         getCurrentLocation();
         const interval = setInterval(() => {
             checkTripStatus();
@@ -122,7 +133,7 @@ const PendingTrip = () => {
     const updateSelfLocation = async () => {
         try {
             if (userLocation && role) {
-                await updateLocation(tripId, userLocation.latitude, userLocation.longitude, role);
+                await updateLocation(3, userLocation.latitude, userLocation.longitude, role);
             }
         } catch (error) {
             console.error('Erro ao atualizar a localização:', error);
@@ -132,19 +143,19 @@ const PendingTrip = () => {
     const updateLocations = async () => {
         try {
             if (role === 'passenger') {
-                const driverLoc = await getLocation(tripId, 'driver').catch(err => {
+                const driverLoc = await getLocation(3, 'driver').catch(err => {
                     console.error('Erro ao buscar a localização do motorista:', err);
                     throw err;
                 }); // Função que busca a localização do motorista
                 console.log('Localização do motorista:', driverLoc);
-                setOtherLocation({ latitude: -29.11037478534928, longitude: -49.62256924856739 });
+                setOtherLocation(driverLoc);
             } else {
-                const passengerLoc = await getLocation(tripId, 'passenger').catch(err => {
+                const passengerLoc = await getLocation(3, 'passenger').catch(err => {
                     console.error('Erro ao buscar a localização do passageiro:', err);
                     throw err;
                 }); // Função que busca a localização do passageiro
                 console.log('Localização do passageiro:', passengerLoc);
-                setOtherLocation({ latitude: 19.2949123, longitude: -99.1503933 });
+                setOtherLocation(passengerLoc);
             }
             console.log('Localização do outro usuário atualizada');
         } catch (error) {
@@ -157,15 +168,19 @@ const PendingTrip = () => {
             console.log('Verificando status da viagem...');
             console.log('isDriverAssigned:', isDriverAssigned);
             console.log('isTripStarted:', isTripStarted);
-            if (isDriverAssigned || !isTripStarted) return;
-            console.log('Buscando motorista...');
-            const { driver: tripDriver } = await getTripDriver(tripId);
+            if (isDriverAssigned) return;
+            console.log('Buscando motorista...', 3);
+            const { driver: tripDriver } = await getTripDriver(3);
+            console.log('Motorista atribuído:', tripDriver);
             if (tripDriver) {
                 setIsDriverAssigned(true);
+                console.log('Motorista atribuído:', tripDriver);
                 setOtherUserInfo({
                     name: tripDriver.name,
                     avatar: tripDriver.avatarUrl,
                 });
+                console.log('Motorista atribuído:', tripDriver);
+
                 // Atualiza a localização imediatamente após a atribuição do motorista
                 updateLocations();
             }
@@ -176,6 +191,7 @@ const PendingTrip = () => {
 
     const calculateRegion = () => {
         const points = [userLocation, pickupCoordinates, destinationCoordinates];
+
         const latitudes = points.map(point => point?.latitude).filter(Boolean) as number[];
         const longitudes = points.map(point => point?.longitude).filter(Boolean) as number[];
 
@@ -196,7 +212,8 @@ const PendingTrip = () => {
         };
     };
     const handleInitTrip = async () => {
-        await initTravel(tripId).then(() => {
+        await initTravel(3).then(() => {
+            setIsTripStarted(true);
             toastHelper.success('Sucesso', 'Viagem iniciada com sucesso');
         }).catch(() => {
             toastHelper.error('Erro', 'Erro ao iniciar a viagem');
@@ -204,7 +221,8 @@ const PendingTrip = () => {
     }
 
     const handleFinishTrip = async () => {
-        await finishTravel(tripId).then(() => {
+        await finishTravel(3).then(() => {
+            setIsTripStarted(false);
             toastHelper.success('Sucesso', 'Viagem finalizada com sucesso');
         }).catch(() => {
             toastHelper.error('Erro', 'Erro ao finalizar a viagem');
@@ -224,7 +242,11 @@ const PendingTrip = () => {
                         }
                         <Text style={styles.userName}>{otherUserInfo.name}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('chat', { chatId: 1 })}>
+                    <TouchableOpacity onPress={() => navigation.navigate('chat', {
+                        chatId,
+                        passengerName: otherUserInfo.name,
+                        passengerPhoto: otherUserInfo.avatar,
+                    })}>
                         <Text>
                             <Icon name="message1" size={24} color="#fff" />  {/* Botão de Voltar */}
                         </Text>
@@ -276,20 +298,22 @@ const PendingTrip = () => {
                         <Text style={styles.tripTimeText}>Tempo de viagem: {Math.floor(tripTime / 60)}:{tripTime % 60 < 10 ? `0${tripTime % 60}` : tripTime % 60}</Text>
                     </View>
                 )}
-                <TouchableOpacity
-                    style={isTripStarted ? styles.finishTripButton : styles.startTripButton}
-                    onPress={() => {
-                        if (!isTripStarted) {
-                            handleInitTrip()
-                        } else {
-                            handleFinishTrip()
-                        }
-                        setIsTripStarted(!isTripStarted)
-                    }}>
-                    <Text style={styles.buttonText}>
-                        {isTripStarted ? 'Finalizar Viagem' : 'Iniciar Viagem'}
-                    </Text>
-                </TouchableOpacity>
+                {role === 'driver' && (
+                    <TouchableOpacity
+                        style={isTripStarted ? styles.finishTripButton : styles.startTripButton}
+                        onPress={() => {
+                            if (!isTripStarted) {
+                                handleInitTrip()
+                            } else {
+                                handleFinishTrip()
+                            }
+                            setIsTripStarted(!isTripStarted)
+                        }}>
+                        <Text style={styles.buttonText}>
+                            {isTripStarted ? 'Finalizar Viagem' : 'Iniciar Viagem'}
+                        </Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </SafeAreaView>
     );

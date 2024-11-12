@@ -117,10 +117,12 @@ const chooseDestination = () => {
         }
         const taxiValue = 2.5;
         await createTravel({
-            latitudedestination: destinationCoordinates.latitude,
-            longitudedestination: destinationCoordinates.longitude,
-            latitudeorigin: location.latitude,
-            longitudeorigin: location.longitude,
+            latitude_destination: destinationCoordinates.latitude,
+            longitude_destination: destinationCoordinates.longitude,
+            latitude_origin: location.latitude,
+            longitude_origin: location.longitude,
+            actual_latitude_passenger: location.latitude,
+            actual_longitude_passenger: location.longitude,
             passenger: user.id,
             value: calculateDistance()! * 0.00001 + taxiValue,
             destination,
@@ -136,7 +138,7 @@ const chooseDestination = () => {
                 pickupCoordinates: location,
             });
         }).catch((error) => {
-            console.error('Erro ao solicitar viagem:', error);
+            console.error('Erro ao solicitar viagem:', error.response.data);
             toastHelper.error('Ops!', 'Erro ao solicitar viagem. Tente novamente.');
         });
     }
