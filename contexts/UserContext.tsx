@@ -24,6 +24,14 @@ type ActiveTravel = {
         latitude: number;
         longitude: number;
     };
+    driver: {
+        name: string;
+        avatar?: string;
+    };
+    driverLocation?: {
+        latitude: number;
+        longitude: number;
+    };
     passenger: {
         name: string;
         avatar?: string;
@@ -76,7 +84,7 @@ export const UserProvider = ({ children }: {
     };
 
     return <UserContext.Provider value={{ user, login, logout }}>
-        {children}
+            {children}
     </UserContext.Provider>;
 
 };

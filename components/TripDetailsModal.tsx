@@ -1,5 +1,4 @@
 import { Trip } from '@/types/trip';
-import { useNavigation } from 'expo-router';
 import React, { useContext, useEffect } from 'react';
 import { View, Text, Button, Modal, StyleSheet, Image } from 'react-native';
 import { RouteList } from '../utils/stackParamRouteList';
@@ -7,6 +6,7 @@ import { API_KEY } from '../constants/Env';
 import { acceptTravel } from '../api/routes';
 import { UserContext } from '../contexts/UserContext';
 import toastHelper from '../utils/toast';
+import { useNavigation } from '@react-navigation/native';
 
 const TripDetailsModal = ({
     visible,

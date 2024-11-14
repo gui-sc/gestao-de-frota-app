@@ -10,6 +10,7 @@ import { API_KEY } from '../constants/Env';
 import { finishTravel, initTravel } from '../api/routes';
 import toastHelper from '../utils/toast';
 import LoadingIndicator from '../components/Loading';
+import { RouteList } from '../utils/stackParamRouteList';
 
 type MapScreenRouteProp = RouteProp<{
     map: {
@@ -42,7 +43,7 @@ const MapScreen = () => {
     const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Carregando...');
     const [displayDestinationAddress, setDisplayDestinationAddress] = useState('Carregando...');
     const [displayPickupAddress, setDisplayPickupAddress] = useState('Carregando...');
-    const navigation = useNavigation();
+    const navigation = useNavigation<RouteList>();
     const [tripTime, setTripTime] = useState(0);
     const [intervalId, setIntervalId] = useState<NodeJS.Timer | null>(null);
 

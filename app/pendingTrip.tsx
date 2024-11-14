@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { API_KEY } from '../constants/Env';
 import MapViewDirections from 'react-native-maps-directions';
-import { updateLocation, getLocation, getTripDriver, initTravel, finishTravel, getChatByTravel } from '../api/routes';
+import { updateLocation, getLocation, getTripDriver, initTravel, finishTravel, getChatByTravel, cancelTravel } from '../api/routes';
 import LoadingIndicator from '../components/Loading';
 import { RouteList } from '../utils/stackParamRouteList';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -22,10 +22,18 @@ type PendingTripProp = RouteProp<{
             latitude: number;
             longitude: number;
         };
+        driverLocation?: {
+            latitude: number;
+            longitude: number;
+        };
         passenger: {
             name: string;
             avatar?: string;
         };
+        driver?: {
+            name: string;
+            avatar?: string;
+        }
         tripId: number;
         destination: string;
     }
@@ -34,16 +42,16 @@ type PendingTripProp = RouteProp<{
 const PendingTrip = () => {
     const { user } = useContext(UserContext);
     const route = useRoute<PendingTripProp>();
-    const { tripId, destinationCoordinates, pickupCoordinates, passenger, destination } = route.params;
+    const { tripId, destinationCoordinates, pickupCoordinates, passenger, destination, driver, driverLocation } = route.params;
     const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-    const [otherLocation, setOtherLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [otherLocation, setOtherLocation] = useState<{ latitude: number; longitude: number } | undefined>();
     const [loading, setLoading] = useState(true);
     const [isTripStarted, setIsTripStarted] = useState(false);
     const [role, setRole] = useState<'passenger' | 'driver' | null>(null); // Exemplo para distinguir entre motorista e passageiro
     const [isDriverAssigned, setIsDriverAssigned] = useState<boolean>(role === 'driver');
     const [tripTime, setTripTime] = useState(0);
     const [intervalId, setIntervalId] = useState<NodeJS.Timer | null>(null);
-    const [otherUserInfo, setOtherUserInfo] = useState<{ name: string; avatar?: string } | null>(null);
+    const [otherUserInfo, setOtherUserInfo] = useState<{ name: string; avatar?: string } | undefined>();
     const navigation = useNavigation<RouteList>();
     const [messageSearch, setMessageSearch] = useState('Procurando motorista');
     const [chatId, setChatId] = useState(0);
@@ -64,8 +72,8 @@ const PendingTrip = () => {
             console.log('User:', user);
             setRole(user.type === 'driver' ? 'driver' : 'passenger')
             setIsDriverAssigned(user.type === 'driver')
-            setOtherUserInfo(user.type === 'driver' ? passenger : null)
-            setOtherLocation(user.type === 'driver' ? pickupCoordinates : null)
+            setOtherUserInfo(user.type === 'driver' ? passenger : driver)
+            setOtherLocation(user.type === 'driver' ? pickupCoordinates : driverLocation)
             console.log(passenger)
         }
     }, [user])
@@ -148,6 +156,13 @@ const PendingTrip = () => {
                     throw err;
                 }); // Função que busca a localização do motorista
                 console.log('Localização do motorista:', driverLoc);
+                if (driverLoc.canceled){
+                    toastHelper.info('Viagem cancelada', 'O motorista cancelou a viagem');
+                    setIsDriverAssigned(false);
+                    setIsTripStarted(false);
+                    setOtherLocation(undefined);
+                    return;
+                }
                 setOtherLocation(driverLoc);
             } else {
                 const passengerLoc = await getLocation(3, 'passenger').catch(err => {
@@ -155,6 +170,11 @@ const PendingTrip = () => {
                     throw err;
                 }); // Função que busca a localização do passageiro
                 console.log('Localização do passageiro:', passengerLoc);
+                if (passengerLoc.canceled){
+                    toastHelper.info('Viagem cancelada', 'O passageiro cancelou a viagem');
+                    navigation.goBack();
+                    return;
+                }
                 setOtherLocation(passengerLoc);
             }
             console.log('Localização do outro usuário atualizada');
@@ -227,6 +247,17 @@ const PendingTrip = () => {
         }).catch(() => {
             toastHelper.error('Erro', 'Erro ao finalizar a viagem');
         })
+    }
+
+    const handleCancelTrip = async (tripId: number) => {
+        await cancelTravel(tripId, role!).then(() => {
+            toastHelper.success('Sucesso', 'Viagem cancelada com sucesso');
+            navigation.goBack();
+        }).catch(() => {
+            toastHelper.error('Erro', 'Erro ao cancelar a viagem');
+        })
+
+        return;
     }
 
     if (loading) return <LoadingIndicator />;
@@ -314,6 +345,17 @@ const PendingTrip = () => {
                         </Text>
                     </TouchableOpacity>
                 )}
+                {!isTripStarted &&
+                    <TouchableOpacity
+                        style={styles.cancelTripButton}
+                        onPress={() => {
+                            handleCancelTrip(tripId);
+                        }}>
+                        <Text style={styles.buttonText}>
+                            {role === 'driver' ? 'Cancelar Viagem' : 'Cancelar Corrida'}
+                        </Text>
+                    </TouchableOpacity>
+                }
             </View>
         </SafeAreaView>
     );

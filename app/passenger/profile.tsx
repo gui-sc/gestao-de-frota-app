@@ -5,18 +5,34 @@ import { maskToCpf } from '@/utils/mask';
 import toast from '../../utils/toast';
 import InputPicture from '../../components/InputPicture';
 import dayjs from 'dayjs';
+import { updateAvatar } from '../../api/routes';
+import toastHelper from '../../utils/toast';
 
 export default function TabFourScreen() {
     const { user, logout } = useContext(UserContext);
     const [dataNascimento, setDataNascimento] = useState<dayjs.Dayjs | null>(dayjs(user?.birth_date));
-    const [foto, setFoto] = useState<string>(user?.avatar || 'https://randomuser.me/api/portraits/men/1.jpg');
-
+    const [foto, setFoto] = useState<string | null>(user?.avatar || null);
+    useEffect(() => {
+        if (!user) return
+        const formData = new FormData();
+        formData.append('profile_picture', {
+            uri: foto,
+            name: `profilePhoto.${foto?.split('.').pop()}`,
+            type: `image/${foto?.split('.').pop()}`
+        } as any)
+        updateAvatar(user?.id, formData).then((response) => {
+            toastHelper.success('Sucesso', 'Foto de perfil atualizada com sucesso');
+        }).catch((error) => {
+            toastHelper.error('Erro', 'Erro ao atualizar foto de perfil');
+            setFoto(user.avatar || null);
+        })
+    }, [foto])
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.container}>
                 <View style={styles.headerContainer}>
                     <Image
-                        source={{ uri: foto }}
+                        source={{ uri: foto || 'https://randomuser.me/api/portraits/men/1.jpg' }}
                         style={styles.image}
                         resizeMode='contain'
                     />

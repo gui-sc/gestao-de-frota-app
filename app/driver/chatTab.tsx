@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, SafeAreaView } from 'react-native';
 import UnreadBadge from '../../components/UnreadBadge';
 import dayjs from 'dayjs';
-import { useNavigation } from 'expo-router';
 import { RouteList } from '../../utils/stackParamRouteList';
 import { getChatByDriver } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
 import { UserContext } from '../../contexts/UserContext';
+import { useNavigation } from '@react-navigation/native';
 
 interface Chat {
   chat_id: number;
@@ -47,7 +47,7 @@ export default function ChatTabScreen() {
           renderItem={({ item }: { item: Chat }) => (
             <TouchableOpacity
               style={styles.chatItem}
-              onPress={() => navigation.navigate('chat', { chatId: item.chat_id })}
+              onPress={() => navigation.navigate('chat', { chatId: item.chat_id, passengerName: item.passenger_name, passengerPhoto: item.avatar })}
             >
               <Image source={{ uri: item.avatar }} style={styles.photo} />
               <View style={styles.chatDetails}>

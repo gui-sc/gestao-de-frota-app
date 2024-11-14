@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
-import { useNavigation } from 'expo-router';
 import { RouteList } from '@/utils/stackParamRouteList';
 import { getLastTravels } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
 import dayjs from 'dayjs';
+import { useNavigation } from '@react-navigation/native';
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
   const navigation = useNavigation<RouteList>();

@@ -51,8 +51,8 @@ export const acceptTravel = async (id: number, driverId: number) => {
     })
 }
 
-export const cancelTravel = async (id: number) => {
-    return api.delete(`/travel/${id}`).then(response => {
+export const cancelTravel = async (id: number, type: 'passenger'|'driver') => {
+    return api.put(`/travel/${id}/cancel/${type}`).then(response => {
         return response.data
     }).catch(error => {
         console.log('error', error.response.data)
@@ -201,6 +201,19 @@ export const loginApp = async (login: string, password: string) => {
 
 export const createUser = async (data: FormData) => {
     return api.post('/user', data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error.response.data)
+        throw error
+    })
+}
+
+export const updateAvatar = async (id: number, data: FormData) => {
+    return api.put(`/user/${id}/avatar`, data, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

@@ -4,8 +4,8 @@ import { UserContext } from '../../contexts/UserContext';
 import { getImportantDates, getLastTravels } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
 import dayjs from 'dayjs';
-import { useNavigation } from 'expo-router';
 import { RouteList } from '../../utils/stackParamRouteList';
+import { useNavigation } from '@react-navigation/native';
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
   const [trips, setTrips] = useState<any[]>([]);

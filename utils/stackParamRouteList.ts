@@ -11,6 +11,14 @@ export type RootStackParamList = {
             latitude: number;
             longitude: number;
         };
+        driverLocation?: {
+            latitude: number;
+            longitude: number;
+        };
+        driver?: {
+            name: string;
+            avatar?: string;
+        };
         passenger: {
             name: string;
             avatar?: string;

@@ -1,12 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import { getMessages, sendMessage } from '../api/routes';
 import { UserContext } from '../contexts/UserContext';
 import LoadingIndicator from '../components/Loading';
 import toastHelper from '../utils/toast';
-import { useNavigation } from 'expo-router';
 import { RouteList } from '../utils/stackParamRouteList';
 
 interface Message {

@@ -4,8 +4,8 @@ import { UserContext } from '../contexts/UserContext';
 import LoadingIndicator from '../components/Loading';
 import toastHelper from '@/utils/toast';
 import { loginApp } from '../api/routes';
-import { useNavigation } from 'expo-router';
 import { RouteList } from '../utils/stackParamRouteList';
+import { useNavigation } from 'expo-router';
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
@@ -29,13 +29,6 @@ export default function LoginScreen() {
       toastHelper.error('Erro ao realizar login', 'error');
     }).finally(() => setLoading(false));
   };
-
-  useEffect(() => {
-    console.log('user', user)
-    if (user) {
-      toastHelper.success('Login realizado com sucesso!', 'success');
-    }
-  }, [user]);
 
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
