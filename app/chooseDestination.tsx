@@ -11,8 +11,9 @@ import toastHelper from '../utils/toast';
 import LoadingIndicator from '../components/Loading';
 import { RouteList } from '../utils/stackParamRouteList';
 import { UserContext } from '../contexts/UserContext';
+import { navigate } from './rootNavigation';
 
-const chooseDestination = () => {
+const ChooseDestination = () => {
     const { user } = useContext(UserContext);
     const [location, setLocation] = useState<{
         latitude: number;
@@ -105,7 +106,7 @@ const chooseDestination = () => {
     const handleNewTrip = async () => {
         if (!user) {
             toastHelper.info('Ops!', 'Você precisa estar logado para solicitar uma viagem.');
-            return navigation.navigate('index');
+            return navigate('index');
         }
         if (!destinationCoordinates) {
             toastHelper.info('Ops!', 'Você precisa escolher um destino para solicitar uma viagem.');
@@ -334,4 +335,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default chooseDestination;
+export default ChooseDestination;

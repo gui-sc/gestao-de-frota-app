@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { createContext, useState } from 'react';
 import { RouteList } from '../utils/stackParamRouteList';
+import { navigate } from '../app/rootNavigation';
 type User = {
     id: number;
     type: 'passenger' | 'driver';
@@ -56,16 +57,15 @@ export const UserProvider = ({ children }: {
     children: React.ReactNode;
 }) => {
     const [user, setUser] = useState<User | null>(null);
-    const navigation = useNavigation<RouteList>();
     // Função para logar o  usuário
     const login = (userData: User, activeTravel: ActiveTravel | undefined) => {
         setUser(userData);
         if (userData.active === false) {
-            navigation.navigate('pendingApproval');
+            navigate('pendingApproval');
             return;
         }
         if (activeTravel) {
-            navigation.navigate('pendingTrip', {
+            navigate('pendingTrip', {
                 pickupCoordinates: activeTravel.pickupCoordinates,
                 destinationCoordinates: activeTravel.dropoffCoordinates,
                 passenger: activeTravel.passenger,
@@ -73,14 +73,14 @@ export const UserProvider = ({ children }: {
             });
             return;
         }
-        if (userData.type == 'driver') navigation.navigate('driver');
-        if (userData.type == 'passenger') navigation.navigate('passenger')
+        if (userData.type == 'driver') navigate('driver');
+        if (userData.type == 'passenger') navigate('passenger')
     };
 
     // Função para deslogar o usuário
     const logout = () => {
         setUser(null);
-        navigation.navigate('index');
+        navigate('index');
     };
 
     return <UserContext.Provider value={{ user, login, logout }}>

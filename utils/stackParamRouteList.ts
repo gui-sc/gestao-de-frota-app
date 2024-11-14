@@ -1,7 +1,7 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 
 export type RootStackParamList = {
-    index: undefined;
+    login: undefined;
     pendingTrip: {
         pickupCoordinates: {
             latitude: number;

@@ -7,6 +7,7 @@ import { UserContext } from '../contexts/UserContext';
 import LoadingIndicator from '../components/Loading';
 import toastHelper from '../utils/toast';
 import { RouteList } from '../utils/stackParamRouteList';
+import { navigate } from './rootNavigation';
 
 interface Message {
     id: string;
@@ -33,7 +34,7 @@ export default function ChatScreen() {
     const handleSendMessage = () => {
         if (!user) {
             toastHelper.info('Ops', 'Você precisa estar logado para enviar mensagens');
-            return navigation.navigate('index');
+            return navigate('index');
         }
         if (newMessage.trim()) {
             sendMessage(chatId, newMessage, user.id).then(() => {
@@ -64,7 +65,7 @@ export default function ChatScreen() {
     }, [seconds])
 
     if(!user) {
-        navigation.navigate('index');
+        navigate('index');
         return
     }
 
