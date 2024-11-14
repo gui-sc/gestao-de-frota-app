@@ -113,12 +113,12 @@ export default function DriverRegistrationScreen() {
             toastHelper.error('Preencha todos os campos!', 'Selecione a marca e modelo do veículo');
             return;
         }
-        formData.append('modelo', `${brand?.nome}-${model?.nome}`);
-        formData.append('ano', year);
-        formData.append('placa', plate);
+        formData.append('model', `${brand?.nome}-${model?.nome}`);
+        formData.append('year', year);
+        formData.append('plate', plate);
         formData.append('renavam', renavam);
-        formData.append('cor', color);
-        formData.append('driverId', id.toString());
+        formData.append('color', color);
+        formData.append('driver_id', id.toString());
 
 
         for (let i = 0; i < vehiclePhotos.length; i++) {
