@@ -4,15 +4,13 @@ import { UserContext } from '../contexts/UserContext';
 import LoadingIndicator from '../components/Loading';
 import toastHelper from '@/utils/toast';
 import { loginApp } from '../api/routes';
-import { RouteList } from '../utils/stackParamRouteList';
-import { useNavigation } from 'expo-router';
+import { navigate } from './rootNavigation';
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const navigation = useNavigation<RouteList>();
 
   const { login, user } = useContext(UserContext);
 
@@ -35,12 +33,12 @@ export default function LoginScreen() {
 
   const navigateToPassengerRegistration = () => {
     closeModal();
-    navigation.navigate('passengerRegistration');
+    navigate('passengerRegistration');
   };
 
   const navigateToDriverRegistration = () => {
     closeModal();
-    navigation.navigate('driverRegistration');
+    navigate('driverRegistration');
   };
   if (loading) return <LoadingIndicator />;
 

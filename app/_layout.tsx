@@ -1,12 +1,11 @@
 import { DarkTheme, DefaultTheme, ThemeProvider, NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { UserProvider, UserContext } from '../contexts/UserContext'; // Importa UserContext
+import { UserProvider } from '../contexts/UserContext'; // Importa UserContext
 import Toast from 'react-native-toast-message';
-import { Stack } from 'expo-router';
 import { navigationRef } from './rootNavigation';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '../utils/stackParamRouteList';
@@ -20,7 +19,11 @@ import MapScreen from './map';
 import DriverRegistrationScreen from './driverRegistration';
 import PassengerRegistrationScreen from './passengerRegistration';
 import PendingApprovalScreen from './pendingApproval';
-import TabLayout from './driver/_layout';
+import ChatTabScreenDriver from './driver/chatTab';
+import ChatTabScreenPassenger from './passenger/chatTab';
+import DriverProfileScreen from './driver/profile';
+import UserProfileScreen from './passenger/profile';
+import TripListScreen from './driver/trips';
 const RootStack = createStackNavigator<RootStackParamList>();
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
@@ -28,8 +31,6 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
-
-  const { user } = useContext(UserContext); // Pega o estado do usuário
 
   useEffect(() => {
     if (loaded) {
@@ -49,7 +50,12 @@ export default function RootLayout() {
             <RootStack.Screen name="login"
               options={{ headerShown: false }}
               component={LoginScreen} />
-            <RootStack.Screen name="driver" options={{ headerShown: false }} component={TabLayout} />
+            <RootStack.Screen name="driver" options={{ headerShown: false }} component={HomeScreenDriver} />
+            <RootStack.Screen name='driverChatTab' options={{ headerShown: false }} component={ChatTabScreenDriver} />
+            <RootStack.Screen name="driverProfile" options={{ headerShown: false }} component={DriverProfileScreen} />
+            <RootStack.Screen name="tripTab" options={{ headerShown: false }} component={TripListScreen} />
+            <RootStack.Screen name="passengerChatTab" options={{ headerShown: false }} component={ChatTabScreenPassenger} />
+            <RootStack.Screen name="passengerProfile" options={{ headerShown: false }} component={UserProfileScreen} />
             <RootStack.Screen name="passenger" options={{ headerShown: false }} component={HomeScreenPassenger} />
             <RootStack.Screen name="chat" options={{ headerShown: false }} component={ChatScreen} />
             <RootStack.Screen name="pendingTrip" options={{ headerShown: false }} component={PendingTrip} />

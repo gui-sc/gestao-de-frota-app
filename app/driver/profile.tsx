@@ -7,8 +7,10 @@ import InputPicture from '../../components/InputPicture';
 import dayjs from 'dayjs';
 import { updateAvatar } from '../../api/routes';
 import toastHelper from '../../utils/toast';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import BottomTabs from '../../components/BottomTabs';
 
-export default function TabFourScreen() {
+export default function DriverProfileScreen() {
     const { user, logout } = useContext(UserContext);
     const [dataNascimento, setDataNascimento] = useState<dayjs.Dayjs | null>(dayjs(user?.birth_date));
     const [foto, setFoto] = useState<string | null>(user?.avatar || null);
@@ -28,6 +30,13 @@ export default function TabFourScreen() {
             setFoto(user.avatar || null);
         })
     }, [foto])
+
+    const routes = [
+        { label: 'Home', icon: <Icon name="home" size={24} color="#44EAC3" />, route: 'driver' },
+        { label: 'Conversas', icon: <Icon name="chat" size={24} color="#44EAC3" />, route: 'driverChatTab' },
+        { label: 'Viagens', icon: <Icon name="map" size={24} color="#44EAC3" />, route: 'tripTab' },
+        { label: 'Perfil', icon: <Icon name="person" size={24} color="#44EAC3" />, route: 'driverProfile' },
+    ];
 
     return (
         <SafeAreaView style={styles.container}>
@@ -66,6 +75,7 @@ export default function TabFourScreen() {
                     <Text style={styles.buttonText}>Sair</Text>
                 </TouchableOpacity>
             </ScrollView>
+            <BottomTabs routes={routes} />
         </SafeAreaView>
     );
 }

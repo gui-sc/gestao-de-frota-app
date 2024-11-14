@@ -6,6 +6,10 @@ import { getLastTravels } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
 import dayjs from 'dayjs';
 import { useNavigation } from '@react-navigation/native';
+import BottomTabs from '../../components/BottomTabs';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { navigate } from '../rootNavigation';
+
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
   const navigation = useNavigation<RouteList>();
@@ -14,21 +18,30 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (!user) {
-      return navigation.navigate('index');
+      return navigate('login');
     }
     setLoading(true);
-    getLastTravels(user.id, 'passenger').then((trips) => {
-      setTrips(trips);
-    }).catch(err => console.log(err)).finally(() => setLoading(false));
+    getLastTravels(user.id, 'passenger')
+      .then((trips) => {
+        setTrips(trips);
+      })
+      .catch(err => console.log(err))
+      .finally(() => setLoading(false));
   }, []);
+
+  const handleNewTrip = () => {
+    navigate('chooseDestination');
+  }
 
   if (loading) {
     return <LoadingIndicator />;
   }
 
-  const handleNewTrip = () => {
-    navigation.navigate('chooseDestination');
-  }
+  const routes = [
+    { label: 'Home', icon: <Icon name="home" size={24} color="#44EAC3" />, route: 'passenger' },
+    { label: 'Conversas', icon: <Icon name="chat" size={24} color="#44EAC3" />, route: 'passengerChatTab' },
+    { label: 'Perfil', icon: <Icon name="person" size={24} color="#44EAC3" />, route: 'passengerProfile' },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,12 +60,11 @@ export default function HomeScreen() {
             </View>
           )}
         />
-
         <TouchableOpacity onPress={handleNewTrip} style={styles.button}>
           <Text style={styles.buttonText}>Nova Viagem</Text>
         </TouchableOpacity>
-
       </View>
+      <BottomTabs routes={routes} />
     </SafeAreaView>
   );
 }
@@ -92,5 +104,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#000',
     fontWeight: 'bold',
-  }
+  },
 });

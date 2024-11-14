@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { createDriver, createVehicle } from '../api/routes';
 import { maskToDate } from '../utils/mask';
 import toastHelper from '../utils/toast';
+import { navigate } from './rootNavigation';
 
 export default function DriverRegistrationScreen() {
     const [step, setStep] = useState(1);
@@ -129,7 +130,7 @@ export default function DriverRegistrationScreen() {
         }
 
         await createVehicle(formData).then(response => {
-            navigation.navigate('index');
+            navigate('pendingApproval');
         }).catch(error => {
             console.log('error', error)
             toastHelper.error('Erro ao cadastrar veículo', 'Tente novamente mais tarde');

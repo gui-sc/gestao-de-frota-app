@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, Button, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RouteList } from '../utils/stackParamRouteList';
+import { navigate } from './rootNavigation';
 
 export default function PendingApprovalScreen() {
     const navigation = useNavigation<RouteList>();
 
     const handleLogout = () => {
         // Implementação de logout
-        navigation.navigate('index');
+        navigate('login');
     };
 
     return (

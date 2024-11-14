@@ -7,6 +7,7 @@ import { maskToDate } from '../utils/mask';
 import { RouteList } from '../utils/stackParamRouteList';
 import { useNavigation } from '@react-navigation/native';
 import toastHelper from '../utils/toast';
+import { navigate } from './rootNavigation';
 
 export default function PassengerRegistrationScreen() {
 
@@ -57,7 +58,7 @@ export default function PassengerRegistrationScreen() {
 
         await createUser(formData).then(res => {
             console.log('res', res)
-            navigation.navigate('index');
+            navigate('login');
         }).catch(error => {
             console.log('error', error)
             toastHelper.error('Erro ao cadastrar usuário', 'Tente novamente mais tarde');

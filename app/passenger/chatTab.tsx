@@ -6,7 +6,9 @@ import { RouteList } from '../../utils/stackParamRouteList';
 import { getChatByPassenger } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
 import { UserContext } from '../../contexts/UserContext';
-import { useNavigation } from '@react-navigation/native';
+import { navigate } from '../rootNavigation';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import BottomTabs from '../../components/BottomTabs';
 
 interface Chat {
   chat_id: number;
@@ -23,10 +25,9 @@ export default function ChatTabScreen() {
   const [chats, setChats] = useState([])
   const [loading, setLoading] = useState(true);
 
-  const navigation = useNavigation<RouteList>();
   useEffect(() => {
     if (!user) {
-      return navigation.navigate('index');
+      return navigate('login');
     }
     setLoading(true);
     getChatByPassenger(user.id).then((chats) => {
@@ -34,6 +35,12 @@ export default function ChatTabScreen() {
       setChats(chats);
     }).finally(() => setLoading(false));
   }, []);
+
+  const routes = [
+    { label: 'Home', icon: <Icon name="home" size={24} color="#44EAC3" />, route: 'passenger' },
+    { label: 'Conversas', icon: <Icon name="chat" size={24} color="#44EAC3" />, route: 'passengerChatTab' },
+    { label: 'Perfil', icon: <Icon name="person" size={24} color="#44EAC3" />, route: 'passengerProfile' },
+  ];
 
   if (loading) return <LoadingIndicator />;
 
@@ -47,7 +54,7 @@ export default function ChatTabScreen() {
           renderItem={({ item }: { item: Chat }) => (
             <TouchableOpacity
               style={styles.chatItem}
-              onPress={() => navigation.navigate('chat', { chatId: item.chat_id, passengerName: item.driver_name, passengerPhoto: item.avatar })}
+              onPress={() => navigate('chat', { chatId: item.chat_id, passengerName: item.driver_name, passengerPhoto: item.avatar })}
             >
               <Image source={{ uri: item.avatar }} style={styles.photo} />
               <View style={styles.chatDetails}>
@@ -64,6 +71,7 @@ export default function ChatTabScreen() {
           )}
         />
       </View>
+      <BottomTabs routes={routes} />
     </SafeAreaView>
   );
 }

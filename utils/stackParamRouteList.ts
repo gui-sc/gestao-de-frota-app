@@ -2,6 +2,11 @@ import { StackNavigationProp } from "@react-navigation/stack";
 
 export type RootStackParamList = {
     login: undefined;
+    driverChatTab: undefined;
+    driverProfile: undefined;
+    tripTab: undefined;
+    passengerChatTab: undefined;
+    passengerProfile: undefined;
     pendingTrip: {
         pickupCoordinates: {
             latitude: number;

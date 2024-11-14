@@ -11,6 +11,7 @@ import { finishTravel, initTravel } from '../api/routes';
 import toastHelper from '../utils/toast';
 import LoadingIndicator from '../components/Loading';
 import { RouteList } from '../utils/stackParamRouteList';
+import { navigate } from './rootNavigation';
 
 type MapScreenRouteProp = RouteProp<{
     map: {
@@ -153,7 +154,7 @@ const MapScreen = () => {
         <View style={styles.container}>
             {/* Informações do passageiro */}
             <View style={styles.passengerInfo}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <TouchableOpacity onPress={() => navigate(user?.type ?? 'login')}>
                     <Text>
                         <Icon name="arrow-left" size={24} color="#fff" />  {/* Botão de Voltar */}
                     </Text>

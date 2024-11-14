@@ -7,6 +7,7 @@ import { acceptTravel } from '../api/routes';
 import { UserContext } from '../contexts/UserContext';
 import toastHelper from '../utils/toast';
 import { useNavigation } from '@react-navigation/native';
+import { navigate } from '../app/rootNavigation';
 
 const TripDetailsModal = ({
     visible,
@@ -24,7 +25,7 @@ const TripDetailsModal = ({
 
     const handleAcceptTrip = async () => {
         await acceptTravel(trip.id, user.id).then(() => {
-            navigation.navigate('pendingTrip', {
+            navigate('pendingTrip', {
                 tripId: trip.id,
                 pickupCoordinates: trip.pickupCoordinates,
                 destinationCoordinates: trip.dropoffCoordinates,

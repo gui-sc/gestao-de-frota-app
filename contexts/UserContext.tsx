@@ -80,7 +80,7 @@ export const UserProvider = ({ children }: {
     // Função para deslogar o usuário
     const logout = () => {
         setUser(null);
-        navigate('index');
+        navigate('login');
     };
 
     return <UserContext.Provider value={{ user, login, logout }}>

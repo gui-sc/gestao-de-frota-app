@@ -129,7 +129,7 @@ const ChooseDestination = () => {
             destination,
         }).then((res) => {
             toastHelper.success('Sucesso', 'Viagem solicitada com sucesso!');
-            navigation.navigate('pendingTrip', {
+            navigate('pendingTrip', {
                 tripId: res.id,
                 destinationCoordinates,
                 passenger: {
@@ -178,7 +178,7 @@ const ChooseDestination = () => {
                 >
                     {/* Campo de destino no topo */}
                     <View style={styles.topInputContainer}>
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <TouchableOpacity onPress={() => navigate('passenger')}>
                             <Text>
                                 <Icon name="arrow-left" size={24} color="#fff" />  {/* Botão de Voltar */}
                             </Text>

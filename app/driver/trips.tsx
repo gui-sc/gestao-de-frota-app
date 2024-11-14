@@ -6,8 +6,10 @@ import { getByRange } from '../../api/routes';
 import * as Location from 'expo-location';
 import toastHelper from '../../utils/toast';
 import LoadingIndicator from '../../components/Loading';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import BottomTabs from '../../components/BottomTabs';
 
-export default function HomeScreen() {
+export default function TripListScreen() {
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [radius, setRadius] = useState<number>(2);
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -75,6 +77,12 @@ export default function HomeScreen() {
     searchTrip();
   }, [location, radius]);
 
+  const routes = [
+    { label: 'Home', icon: <Icon name="home" size={24} color="#44EAC3" />, route: 'driver' },
+    { label: 'Conversas', icon: <Icon name="chat" size={24} color="#44EAC3" />, route: 'driverChatTab' },
+    { label: 'Viagens', icon: <Icon name="map" size={24} color="#44EAC3" />, route: 'tripTab' },
+    { label: 'Perfil', icon: <Icon name="person" size={24} color="#44EAC3" />, route: 'driverProfile' },
+  ];
   if (loading) {
     return <LoadingIndicator />;
   }
@@ -107,6 +115,7 @@ export default function HomeScreen() {
         {selectedTrip && <TripDetailsModal visible={!!selectedTrip} trip={selectedTrip} onClose={closeModal} />}
 
       </View>
+      <BottomTabs routes={routes} />
     </SafeAreaView>
   );
 }

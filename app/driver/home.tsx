@@ -6,13 +6,21 @@ import LoadingIndicator from '../../components/Loading';
 import dayjs from 'dayjs';
 import { RouteList } from '../../utils/stackParamRouteList';
 import { useNavigation } from '@react-navigation/native';
+import { navigate } from '../rootNavigation';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import BottomTabs from '../../components/BottomTabs';
 export default function HomeScreen() {
   const { user } = useContext(UserContext);
   const [trips, setTrips] = useState<any[]>([]);
   const [importantDates, setImportantDates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation<RouteList>();
 
+  const routes = [
+    { label: 'Home', icon: <Icon name="home" size={24} color="#44EAC3" />, route: 'driver' },
+    { label: 'Conversas', icon: <Icon name="chat" size={24} color="#44EAC3" />, route: 'driverChatTab' },
+    { label: 'Viagens', icon: <Icon name="map" size={24} color="#44EAC3" />, route: 'tripTab' },
+    { label: 'Perfil', icon: <Icon name="person" size={24} color="#44EAC3" />, route: 'driverProfile' },
+  ];
 
   useEffect(() => {
     setLoading(true);
@@ -34,7 +42,7 @@ export default function HomeScreen() {
   useEffect(() => {
     console.log('user', user)
     if (!user || user.type !== 'driver') {
-      return navigation.navigate('index');
+      return navigate('login');
     }
   }, [])
 
@@ -76,6 +84,7 @@ export default function HomeScreen() {
         />
 
       </View>
+      <BottomTabs routes={routes} />
     </SafeAreaView>
   );
 }

@@ -11,6 +11,7 @@ import { RouteList } from '../utils/stackParamRouteList';
 import Icon from 'react-native-vector-icons/AntDesign';
 import toastHelper from '../utils/toast';
 import { UserContext } from '../contexts/UserContext';
+import { navigate } from './rootNavigation';
 
 type PendingTripProp = RouteProp<{
     pendingTrip: {
@@ -172,7 +173,7 @@ const PendingTrip = () => {
                 console.log('Localização do passageiro:', passengerLoc);
                 if (passengerLoc.canceled){
                     toastHelper.info('Viagem cancelada', 'O passageiro cancelou a viagem');
-                    navigation.goBack();
+                    navigate('driver');
                     return;
                 }
                 setOtherLocation(passengerLoc);
@@ -252,7 +253,7 @@ const PendingTrip = () => {
     const handleCancelTrip = async (tripId: number) => {
         await cancelTravel(tripId, role!).then(() => {
             toastHelper.success('Sucesso', 'Viagem cancelada com sucesso');
-            navigation.goBack();
+            navigate(user?.type ?? 'login');
         }).catch(() => {
             toastHelper.error('Erro', 'Erro ao cancelar a viagem');
         })
@@ -273,7 +274,7 @@ const PendingTrip = () => {
                         }
                         <Text style={styles.userName}>{otherUserInfo.name}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('chat', {
+                    <TouchableOpacity onPress={() => navigate('chat', {
                         chatId,
                         passengerName: otherUserInfo.name,
                         passengerPhoto: otherUserInfo.avatar,
