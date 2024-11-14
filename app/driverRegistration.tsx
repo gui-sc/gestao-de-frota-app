@@ -132,7 +132,6 @@ export default function DriverRegistrationScreen() {
         await createVehicle(formData).then(response => {
             navigate('pendingApproval');
         }).catch(error => {
-            console.log('error', error)
             toastHelper.error('Erro ao cadastrar veículo', 'Tente novamente mais tarde');
         });
     };

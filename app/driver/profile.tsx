@@ -16,11 +16,12 @@ export default function DriverProfileScreen() {
     const [foto, setFoto] = useState<string | null>(user?.avatar || null);
 
     useEffect(() => {
-        if (!user) return
+        if (!user || !foto) return;
+        if(user.avatar === foto) return;
         const formData = new FormData();
-        formData.append('profile_picture', {
+        formData.append('avatar', {
             uri: foto,
-            name: `profilePhoto.${foto?.split('.').pop()}`,
+            name: `avatar.${foto?.split('.').pop()}`,
             type: `image/${foto?.split('.').pop()}`
         } as any)
         updateAvatar(user?.id, formData).then((response) => {

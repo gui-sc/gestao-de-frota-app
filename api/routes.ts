@@ -233,7 +233,8 @@ export const createDriver = async (data: FormData) => {
     }).then(response => {
         return response.data
     }).catch(error => {
-        console.log('error', error.response.data)
+        console.log('error', error)
+        console.log('error vehicle',JSON.stringify(error?.response?.data?.error?.issues))
         throw error
     })
 }
@@ -246,7 +247,8 @@ export const createVehicle = async (data: FormData) => {
     }).then(response => {
         return response.data
     }).catch(error => {
-        console.log('error', error.response.data)
+        console.log('error', error)
+        console.log('error vehicle',JSON.stringify(error?.response?.data?.error?.issues))
         throw error
     })
 }
