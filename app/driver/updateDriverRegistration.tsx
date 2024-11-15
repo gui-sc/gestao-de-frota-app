@@ -15,6 +15,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import toastHelper from '../../utils/toast';
 import CarBrandPicker from '../../components/CarBrandModelSelector';
+import { getDriver, updateDriver, updateVehicle } from '../../api/routes';
+import LoadingIndicator from '../../components/Loading';
+import { navigate } from '../../utils/rootNavigation';
 
 type UpdateDriverScreenProps = RouteProp<{
     updateDriverRegistration: {
@@ -26,8 +29,8 @@ export default function UpdateDriverScreen() {
 
     const route = useRoute<UpdateDriverScreenProps>();
     const { driverId } = route.params; // Recebe o ID do motorista via props
+    const [loading, setLoading] = useState(true);
     const [driverData, setDriverData] = useState<any>(null);
-    const [vehicleData, setVehicleData] = useState<any>(null);
 
     const [documentPhoto, setDocumentPhoto] = useState<string | null>(null);
     const [holdingDocumentPhoto, setHoldingDocumentPhoto] = useState<string | null>(null);
@@ -45,41 +48,28 @@ export default function UpdateDriverScreen() {
     const [color, setColor] = useState('');
     const [plate, setPlate] = useState('');
     const [renavam, setRenavam] = useState('');
+    const [vehicleId, setVehicleId] = useState<number | null>(null);
     const [vehiclePhotos, setVehiclePhotos] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = {
-                    driver: {
-                        name: 'Guilherme',
-                        lastName: 'Motorista',
-                        email: 'aaaa    @gmail.com',
-                        phone: '999999999',
-                        cpf: '12345678901',
-                        birthDate: '01/01/1990',
-                    },
-                    vehicle: {
-                        brand: 'Fiat',
-                        model: 'Uno',
-                        year: '2010',
-                        color: 'Preto',
-                        plate: 'ABC1234',
-                        renavam: '12345678901',
-                        pictures: [
-                            'https://i.pinimg.com/originals/6e/3c/3f/6e3c3f1f7a0d7e3f9b4b8d3f6f0c4d0b.jpg',
-                            'https://i.pinimg.com/originals/6e/3c/3f/6e3c3f1f7a0d7e3f9b4b8d3f6f0c4d0b.jpg',
-                        ],
-                    },
-                };
-                setDriverData(data.driver);
-                setVehicleData(data.vehicle);
+                const data = await getDriver(driverId).finally(() => setLoading(false));
+                console.log('data', data)
+                setDriverData({
+                    name: data.user.name,
+                    lastName: data.user.last_name,
+                    email: data.user.email,
+                    phone: data.user.phone,
+                    cpf: data.user.cpf,
+                    birthDate: data.user.birth_date.split('-').reverse().join('/'),
+                });
 
-                setYear(data.vehicle.year);
+                setYear(data.vehicle.year.toString());
                 setColor(data.vehicle.color);
                 setPlate(data.vehicle.plate);
                 setRenavam(data.vehicle.renavam);
-                setVehiclePhotos(data.vehicle.pictures || []);
+                setVehicleId(data.vehicle.id);
             } catch (error) {
                 toastHelper.error('Erro ao carregar dados', 'Tente novamente mais tarde.');
             }
@@ -111,18 +101,50 @@ export default function UpdateDriverScreen() {
         }
     };
 
+    const handleUpdateDriver = async () => {
+        const formData = new FormData();
+        formData.append('cnh_picture', {
+            uri: documentPhoto,
+            name: `documentPhoto.${documentPhoto?.split('.').pop()}`,
+            type: `image/${documentPhoto?.split('.').pop()}`
+        } as any)
+        formData.append('profile_doc_picture', {
+            uri: holdingDocumentPhoto,
+            name: `holdingDocumentPhoto.${holdingDocumentPhoto?.split('.').pop()}`,
+            type: `image/${holdingDocumentPhoto?.split('.').pop()}`
+        } as any)
+        formData.append('profile_picture', {
+            uri: profilePhoto,
+            name: `profilePhoto.${profilePhoto?.split('.').pop()}`,
+            type: `image/${profilePhoto?.split('.').pop()}`
+        } as any)
+        console.log('formData1', formData)
+        setLoading(true);
+        await updateDriver(driverId, formData).then(res => {
+            console.log('res', res)
+            console.log('vehicleId', vehicleId)
+            console.log('atualizando veículo')
+            handleUpdateVehicle();
+        }).catch(error => {
+            setLoading(false);
+            console.log('error', error)
+            toastHelper.error('Erro ao atualizar cadastro', 'Tente novamente mais tarde.');
+        })
+    }
+
     const handleUpdateVehicle = async () => {
         const formData = new FormData();
-        if (!brand || !model || !year || !color || !plate || !renavam || vehiclePhotos.length === 0) {
+        if (!brand || !model || !year || !color || !plate || !renavam || vehiclePhotos.length === 0 || !vehicleId) {
             toastHelper.error('Dados incompletos', 'Preencha todos os campos e adicione fotos do veículo.');
             return;
         }
-        formData.append('brand', brand.nome);
-        formData.append('model', model.nome);
+
+        formData.append('model', `${brand.nome}-${model.nome}`);
         formData.append('year', year);
-        formData.append('color', color);
         formData.append('plate', plate);
+        formData.append('color', color);
         formData.append('renavam', renavam);
+        formData.append('driver_id', driverId.toString());
 
         for (let i = 0; i < vehiclePhotos.length; i++) {
             formData.append(`pictures`, {
@@ -133,20 +155,25 @@ export default function UpdateDriverScreen() {
         }
 
         try {
-            // await updateVehicleData(driverId, formData);
+            console.log('formData2', formData)
+            console.log('vehicleId', vehicleId)
+            await updateVehicle(vehicleId, formData).then(res => {
+                console.log('res', res)
+                navigate('pendingApproval', { driverId });
+            }).catch(error => {
+                console.log('error', error);
+                toastHelper.error('Erro ao atualizar cadastro', 'Tente novamente mais tarde.');
+            })
             toastHelper.success('Sucesso', 'Cadastro atualizado com sucesso!');
         } catch (error) {
+            console.log('error', error)
             toastHelper.error('Erro ao atualizar cadastro', 'Tente novamente mais tarde.');
+        } finally {
+            setLoading(false);
         }
     };
 
-    if (!driverData || !vehicleData) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <Text style={styles.loadingText}>Carregando dados...</Text>
-            </SafeAreaView>
-        );
-    }
+    if (loading) return <LoadingIndicator />;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -255,7 +282,7 @@ export default function UpdateDriverScreen() {
                         <Image key={index} source={{ uri }} style={styles.photo} />
                     ))}
                 </View>
-                <Button title="Atualizar Cadastro" onPress={handleUpdateVehicle} color="#44EAC3" />
+                <Button title="Atualizar Cadastro" onPress={handleUpdateDriver} color="#44EAC3" />
             </ScrollView>
         </SafeAreaView>
     );

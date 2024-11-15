@@ -62,11 +62,7 @@ export const UserProvider = ({ children }: {
     const login = (userData: User, activeTravel?: ActiveTravel, messages?: DeclineMessage[]) => {
         setUser(userData);
         if (userData.active === false) {
-            navigate('pendingApproval', { messages: [{
-                message: 'Mande mais fotos do carro',
-            },{
-                message: 'A foto da CNH está ilegível',
-            }] });
+            navigate('pendingApproval', { messages });
             return;
         }
         if (activeTravel) {

@@ -37,7 +37,6 @@ export default function PendingApprovalScreen() {
     const openDetailModal = () => setDetailModalVisible(true)
 
     const closeDetailModal = () => {
-        setMainModalVisible(false);
         setDetailModalVisible(false);
         setCurrentMessageIndex(0);
     };
@@ -63,7 +62,7 @@ export default function PendingApprovalScreen() {
 
     const handleUpdateRegister = () => {
         navigate('updateDriverRegistration', {
-            driverId: 1
+            driverId: 8
         });
     }
 
@@ -100,7 +99,7 @@ export default function PendingApprovalScreen() {
             </View>
 
             {/* Modal Principal */}
-            <Modal visible={isMainModalVisible} animationType="fade" transparent>
+            {isMainModalVisible && <Modal visible={isMainModalVisible} animationType="fade" transparent>
                 <View style={styles.overlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalMessage}>
@@ -114,10 +113,10 @@ export default function PendingApprovalScreen() {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </Modal>
+            </Modal>}
 
             {/* Modal de Detalhes */}
-            <Modal visible={isDetailModalVisible} animationType="fade" transparent>
+            {isDetailModalVisible && <Modal visible={isDetailModalVisible} animationType="fade" transparent>
                 <View style={styles.overlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Mensagem {currentMessageIndex + 1}</Text>
@@ -145,7 +144,7 @@ export default function PendingApprovalScreen() {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </Modal>
+            </Modal>}
         </SafeAreaView>
     );
 }

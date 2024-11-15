@@ -8,8 +8,8 @@ import { navigate } from '../utils/rootNavigation';
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('guilhermemotorista1@gmail.com');
-  const [password, setPassword] = useState('1234567');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
   const { login, user } = useContext(UserContext);
@@ -21,7 +21,7 @@ export default function LoginScreen() {
         toastHelper.error('Credenciais Incorretas', response.error.message);
         return
       }
-      login(response.user, response.activeTravel);
+      login(response.user, response.activeTravel, response.messages);
     }).catch(error => {
       console.log('error', error)
       toastHelper.error('Erro ao realizar login', 'error');

@@ -252,7 +252,31 @@ export const createDriver = async (data: FormData) => {
         return response.data
     }).catch(error => {
         console.log('error', error)
-        console.log('error vehicle',JSON.stringify(error?.response?.data?.error?.issues))
+        console.log('error driver',JSON.stringify(error?.response?.data?.error?.issues))
+        throw error
+    })
+}
+
+export const getDriver = async (id: number) => {
+    return api.get(`/driver/${id}`).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error)
+        console.log('error get driver',JSON.stringify(error?.response?.data?.error?.issues))
+        throw error
+    })
+}
+
+export const updateDriver = async (id: number, data: FormData) => {
+    return api.put(`/driver/${id}`, data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error)
+        console.log('error update driver',JSON.stringify(error?.response?.data?.error?.issues))
         throw error
     })
 }
@@ -267,6 +291,20 @@ export const createVehicle = async (data: FormData) => {
     }).catch(error => {
         console.log('error', error)
         console.log('error vehicle',JSON.stringify(error?.response?.data?.error?.issues))
+        throw error
+    })
+}
+
+export const updateVehicle = async (id: number, data: FormData) => {
+    return api.put(`/vehicle/${id}`, data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error)
+        console.log('error update vehicle',JSON.stringify(error?.response?.data?.error?.issues))
         throw error
     })
 }
