@@ -16,7 +16,7 @@ interface Chat {
   passenger: string;
   driver_name: string;
   avatar: string;
-  lastMessage: string;
+  last_message_content: string;
   unread_count: number;
   last_message_time: dayjs.Dayjs; // Ex.: '15:30'
 }
@@ -61,7 +61,7 @@ export default function ChatTabScreen() {
                 <Text style={[styles.passengerName, item.unread_count > 0 && styles.unread]}>
                   {item.driver_name}
                 </Text>
-                <Text style={[styles.lastMessage, item.unread_count > 0 && styles.unread]}>{item.lastMessage}</Text>
+                <Text style={[styles.lastMessage, item.unread_count > 0 && styles.unread]}>{item.last_message_content}</Text>
               </View>
               <View style={styles.messageConfig}>
                 <Text style={styles.last_message_time}>{dayjs(item.last_message_time).format('HH:mm')}</Text>

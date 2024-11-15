@@ -112,7 +112,7 @@ export default function TripListScreen() {
         />
 
         {/* Modal com detalhes da viagem */}
-        {selectedTrip && <TripDetailsModal visible={!!selectedTrip} trip={selectedTrip} onClose={closeModal} />}
+        {selectedTrip && <TripDetailsModal visible={!!selectedTrip} trip={selectedTrip} location={location} onClose={closeModal} />}
 
       </View>
       <BottomTabs routes={routes} />

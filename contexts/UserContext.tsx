@@ -69,7 +69,9 @@ export const UserProvider = ({ children }: {
                 pickupCoordinates: activeTravel.pickupCoordinates,
                 destinationCoordinates: activeTravel.dropoffCoordinates,
                 passenger: activeTravel.passenger,
-                tripId: activeTravel.tripId
+                tripId: activeTravel.tripId,
+                driver: activeTravel.driver,
+                driverLocation: activeTravel.driverLocation
             });
             return;
         }

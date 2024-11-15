@@ -5,13 +5,14 @@ import * as Location from 'expo-location';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { API_KEY } from '../constants/Env';
 import MapViewDirections from 'react-native-maps-directions';
-import { updateLocation, getLocation, getTripDriver, initTravel, finishTravel, getChatByTravel, cancelTravel } from '../api/routes';
+import { updateLocation, getLocation, getTripDriver, initTravel, finishTravel, getChatByTravel, cancelTravel, getUnreadMessagesCount } from '../api/routes';
 import LoadingIndicator from '../components/Loading';
 import { RouteList } from '../utils/stackParamRouteList';
 import Icon from 'react-native-vector-icons/AntDesign';
 import toastHelper from '../utils/toast';
 import { UserContext } from '../contexts/UserContext';
 import { navigate } from './rootNavigation';
+import UnreadBadge from '../components/UnreadBadge';
 
 type PendingTripProp = RouteProp<{
     pendingTrip: {
@@ -49,14 +50,14 @@ const PendingTrip = () => {
     const [loading, setLoading] = useState(true);
     const [isTripStarted, setIsTripStarted] = useState(false);
     const [role, setRole] = useState<'passenger' | 'driver' | null>(null); // Exemplo para distinguir entre motorista e passageiro
-    const [isDriverAssigned, setIsDriverAssigned] = useState<boolean>(role === 'driver');
+    const [isDriverAssigned, setIsDriverAssigned] = useState<boolean>(role === 'driver' || driver !== undefined);
     const [tripTime, setTripTime] = useState(0);
     const [intervalId, setIntervalId] = useState<NodeJS.Timer | null>(null);
     const [otherUserInfo, setOtherUserInfo] = useState<{ name: string; avatar?: string } | undefined>();
     const navigation = useNavigation<RouteList>();
     const [messageSearch, setMessageSearch] = useState('Procurando motorista');
     const [chatId, setChatId] = useState(0);
-
+    const [unreadCountMessages, setUnreadCountMessages] = useState(0);
     useEffect(() => {
         if (isTripStarted) {
             const id = setInterval(() => {
@@ -72,7 +73,7 @@ const PendingTrip = () => {
         if (user) {
             console.log('User:', user);
             setRole(user.type === 'driver' ? 'driver' : 'passenger')
-            setIsDriverAssigned(user.type === 'driver')
+            setIsDriverAssigned(user.type === 'driver' || driver !== undefined)
             setOtherUserInfo(user.type === 'driver' ? passenger : driver)
             setOtherLocation(user.type === 'driver' ? pickupCoordinates : driverLocation)
             console.log(passenger)
@@ -92,8 +93,20 @@ const PendingTrip = () => {
     })
 
     useEffect(() => {
-        getChatByTravel(3).then((chat) => {
-            setChatId(3);
+        if (chatId && user?.id) {
+            getUnreadMessagesCount(chatId, user.id).then((res) => {
+                console.log('Mensagens não lidas:', res.unreadMessagesCount);
+                setUnreadCountMessages(res.unreadMessagesCount)
+            }).catch((err) => {
+                console.error('Erro ao buscar mensagens não lidas:', err);
+                toastHelper.error('Erro ao buscar mensagens não lidas', 'Tente novamente mais tarde');
+            })
+        }
+    }, [chatId]);
+
+    useEffect(() => {
+        getChatByTravel(tripId).then((chat) => {
+            setChatId(chat.id);
             console.log('Chat:', chat.id);
         }).catch((err) => {
             console.error('Erro ao buscar chat:', err);
@@ -142,7 +155,7 @@ const PendingTrip = () => {
     const updateSelfLocation = async () => {
         try {
             if (userLocation && role) {
-                await updateLocation(3, userLocation.latitude, userLocation.longitude, role);
+                await updateLocation(tripId, userLocation.latitude, userLocation.longitude, role);
             }
         } catch (error) {
             console.error('Erro ao atualizar a localização:', error);
@@ -152,12 +165,12 @@ const PendingTrip = () => {
     const updateLocations = async () => {
         try {
             if (role === 'passenger') {
-                const driverLoc = await getLocation(3, 'driver').catch(err => {
+                const driverLoc = await getLocation(tripId, 'driver').catch(err => {
                     console.error('Erro ao buscar a localização do motorista:', err);
                     throw err;
                 }); // Função que busca a localização do motorista
                 console.log('Localização do motorista:', driverLoc);
-                if (driverLoc.canceled){
+                if (driverLoc.canceled) {
                     toastHelper.info('Viagem cancelada', 'O motorista cancelou a viagem');
                     setIsDriverAssigned(false);
                     setIsTripStarted(false);
@@ -166,12 +179,12 @@ const PendingTrip = () => {
                 }
                 setOtherLocation(driverLoc);
             } else {
-                const passengerLoc = await getLocation(3, 'passenger').catch(err => {
+                const passengerLoc = await getLocation(tripId, 'passenger').catch(err => {
                     console.error('Erro ao buscar a localização do passageiro:', err);
                     throw err;
                 }); // Função que busca a localização do passageiro
                 console.log('Localização do passageiro:', passengerLoc);
-                if (passengerLoc.canceled){
+                if (passengerLoc.canceled) {
                     toastHelper.info('Viagem cancelada', 'O passageiro cancelou a viagem');
                     navigate('driver');
                     return;
@@ -190,15 +203,15 @@ const PendingTrip = () => {
             console.log('isDriverAssigned:', isDriverAssigned);
             console.log('isTripStarted:', isTripStarted);
             if (isDriverAssigned) return;
-            console.log('Buscando motorista...', 3);
-            const { driver: tripDriver } = await getTripDriver(3);
+            console.log('Buscando motorista...', tripId);
+            const { driver: tripDriver } = await getTripDriver(tripId);
             console.log('Motorista atribuído:', tripDriver);
             if (tripDriver) {
                 setIsDriverAssigned(true);
                 console.log('Motorista atribuído:', tripDriver);
                 setOtherUserInfo({
                     name: tripDriver.name,
-                    avatar: tripDriver.avatarUrl,
+                    avatar: tripDriver.avatarURL,
                 });
                 console.log('Motorista atribuído:', tripDriver);
 
@@ -233,7 +246,7 @@ const PendingTrip = () => {
         };
     };
     const handleInitTrip = async () => {
-        await initTravel(3).then(() => {
+        await initTravel(tripId).then(() => {
             setIsTripStarted(true);
             toastHelper.success('Sucesso', 'Viagem iniciada com sucesso');
         }).catch(() => {
@@ -242,7 +255,7 @@ const PendingTrip = () => {
     }
 
     const handleFinishTrip = async () => {
-        await finishTravel(3).then(() => {
+        await finishTravel(tripId).then(() => {
             setIsTripStarted(false);
             toastHelper.success('Sucesso', 'Viagem finalizada com sucesso');
         }).catch(() => {
@@ -278,10 +291,15 @@ const PendingTrip = () => {
                         chatId,
                         passengerName: otherUserInfo.name,
                         passengerPhoto: otherUserInfo.avatar,
-                    })}>
-                        <Text>
-                            <Icon name="message1" size={24} color="#fff" />  {/* Botão de Voltar */}
-                        </Text>
+                    })} style={styles.chatContainer}>
+                        <Icon name="message1" size={24} color="#fff" />  {/* Ícone de chat */}
+                        {unreadCountMessages > 0 && (
+                            <View style={styles.badgeContainer}>
+                                <Text style={styles.badgeText}>
+                                    <UnreadBadge count={unreadCountMessages} />
+                                </Text>
+                            </View>
+                        )}
                     </TouchableOpacity>
                 </View>
             )}
@@ -366,6 +384,18 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#000',
+    },
+    badgeContainer: {
+        position: 'absolute',
+        top: -10,
+        right: -10,
+        backgroundColor: 'transparent', // Manter transparente se o UnreadBadge tiver seu próprio estilo
+    },
+    chatContainer: {
+        position: 'relative',
+    },
+    badgeText: {
+        color: '#fff',
     },
     passengerPhoto: {
         width: 50,

@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import dayjs from 'dayjs';
-import { getMessages, sendMessage } from '../api/routes';
+import { getMessages, readMessages, sendMessage } from '../api/routes';
 import { UserContext } from '../contexts/UserContext';
 import LoadingIndicator from '../components/Loading';
 import toastHelper from '../utils/toast';
@@ -15,11 +15,13 @@ interface Message {
     timestamp: number;
 }
 
-type ChatScreenRouteProp = RouteProp<{ chat: { 
-    chatId: number,
-    passengerName: string,
-    passengerPhoto?: string,
-} }>
+type ChatScreenRouteProp = RouteProp<{
+    chat: {
+        chatId: number,
+        passengerName: string,
+        passengerPhoto?: string,
+    }
+}>
 
 export default function ChatScreen() {
     const { user } = useContext(UserContext);
@@ -52,6 +54,11 @@ export default function ChatScreen() {
     }
 
     useEffect(() => {
+        if (!user) return;
+        readMessages(chatId, user.id).catch(err => {
+            console.log(err);
+            toastHelper.error('Erro ao marcar mensagens como lidas', 'Tente novamente mais tarde');
+        });
         if (seconds % 5 === 0) {
             getMessagesAsync();
         }
@@ -62,7 +69,7 @@ export default function ChatScreen() {
 
     }, [seconds])
 
-    if(!user) {
+    if (!user) {
         navigate('index');
         return
     }

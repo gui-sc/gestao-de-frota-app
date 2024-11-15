@@ -42,8 +42,8 @@ export const getTravelById = async (id: number) => {
     })
 }
 
-export const acceptTravel = async (id: number, driverId: number) => {
-    return api.put(`/travel/${id}/accept`, { driverId }).then(response => {
+export const acceptTravel = async (id: number, driverId: number, location: {longitude: number, latitude: number}) => {
+    return api.put(`/travel/${id}/accept`, { driverId, ...location }).then(response => {
         return response.data
     }).catch(error => {
         console.log('error', error.response.data)
@@ -116,6 +116,24 @@ export const sendMessage = async (id: number, message: string, user: number) => 
 
 export const getMessages = async (id: number) => {
     return api.get(`/chat/message/${id}`).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error.response.data)
+        throw error
+    })
+}
+
+export const readMessages = async (id: number, userId: number) => {
+    return api.put(`/chat/message/${id}/${userId}`).then(response => {
+        return response.data
+    }).catch(error => {
+        console.log('error', error.response.data)
+        throw error
+    })
+}
+
+export const getUnreadMessagesCount = async (id: number, userId: number) => {
+    return api.get(`/chat/message/${id}/${userId}`).then(response => {
         return response.data
     }).catch(error => {
         console.log('error', error.response.data)

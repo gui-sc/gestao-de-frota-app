@@ -12,19 +12,24 @@ import { navigate } from '../app/rootNavigation';
 const TripDetailsModal = ({
     visible,
     trip,
+    location,
     onClose
 }: {
     visible: boolean,
     trip: Trip | null,
+    location: {
+        latitude: number,
+        longitude: number,
+    } | null,
     onClose: () => void
 }) => {
     const navigation = useNavigation<RouteList>();
 
     const { user } = useContext(UserContext);
-    if (!trip || !user) return null;
+    if (!trip || !user || !location) return null;
 
     const handleAcceptTrip = async () => {
-        await acceptTravel(trip.id, user.id).then(() => {
+        await acceptTravel(trip.id, user.id, location).then(() => {
             navigate('pendingTrip', {
                 tripId: trip.id,
                 pickupCoordinates: trip.pickupCoordinates,

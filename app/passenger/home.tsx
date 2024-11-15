@@ -46,7 +46,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.header}>Olá, Usuario!</Text>
+        <Text style={styles.header}>Olá, {user?.name}!</Text>
         <Text style={styles.sectionTitle}>Últimas Viagens</Text>
         <FlatList
           data={trips}
@@ -54,7 +54,7 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <View key={item.id} style={styles.item}>
               <Text style={styles.itemText}>{item.destination}</Text>
-              <Text style={styles.itemText}>
+              <Text style={styles.itemTextHour}>
                 {dayjs(item.finalTime).format('DD/MM/YYYY')} às {dayjs(item.finalTime).format('HH:mm')}
               </Text>
             </View>
@@ -92,6 +92,10 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: '#fff',
+  },
+  itemTextHour: {
+    color: '#fff',
+    textAlign: 'right',
   },
   button: {
     backgroundColor: '#44EAC3',
