@@ -4,14 +4,11 @@ import { View, TextInput, Button, StyleSheet, TouchableOpacity, Text, Image, Key
 import * as ImagePicker from 'expo-image-picker';
 import { createUser } from '../api/routes';
 import { maskToDate } from '../utils/mask';
-import { RouteList } from '../utils/stackParamRouteList';
-import { useNavigation } from '@react-navigation/native';
 import toastHelper from '../utils/toast';
 import { navigate } from './rootNavigation';
 
 export default function PassengerRegistrationScreen() {
 
-    const navigation = useNavigation<RouteList>();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [birthDate, setBirthDate] = useState<string>('');

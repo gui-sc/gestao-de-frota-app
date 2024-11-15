@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, TouchableOpacity, Text, Image, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import CarBrandPicker from '../components/CarBrandModelSelector';
-import { RouteList } from '../utils/stackParamRouteList';
-import { useNavigation } from '@react-navigation/native';
 import { createDriver, createVehicle } from '../api/routes';
 import { maskToDate } from '../utils/mask';
 import toastHelper from '../utils/toast';
@@ -13,7 +11,6 @@ export default function DriverRegistrationScreen() {
     const [step, setStep] = useState(1);
     // Etapa 1
     const [name, setName] = useState('');
-    const navigation = useNavigation<RouteList>();
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [cpf, setCpf] = useState('');
@@ -63,7 +60,9 @@ export default function DriverRegistrationScreen() {
         }
     };
 
+    const handlePreviousStep = () => setStep(1);
     const handleNextStep = () => setStep(2);
+
     const handleRegisterDriver = async () => {
         const formData = new FormData();
         console.log('brand', brand)
@@ -279,6 +278,7 @@ export default function DriverRegistrationScreen() {
                                     <Image key={index} source={{ uri }} style={styles.photo} />
                                 ))}
                             </View>
+                            <Button title="Anterior" onPress={handlePreviousStep} color="#44EAC3" />
                             <Button title="Cadastrar" onPress={handleRegisterDriver} color="#44EAC3" />
                         </>
                     )}

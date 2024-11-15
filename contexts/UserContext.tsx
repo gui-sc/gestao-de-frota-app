@@ -16,6 +16,10 @@ type User = {
     avatar?: string;
 };
 
+type DeclineMessage = {
+    message: string;
+};
+
 type ActiveTravel = {
     pickupCoordinates: {
         latitude: number;
@@ -43,7 +47,7 @@ type ActiveTravel = {
 // Cria o contexto
 export const UserContext = createContext<{
     user: User | null;
-    login: (userData: User, activeTravel: ActiveTravel | undefined) => void;
+    login: (userData: User, activeTravel?: ActiveTravel, messages?: DeclineMessage[]) => void;
 
     logout: () => void;
 }>({
@@ -58,10 +62,14 @@ export const UserProvider = ({ children }: {
 }) => {
     const [user, setUser] = useState<User | null>(null);
     // Função para logar o  usuário
-    const login = (userData: User, activeTravel: ActiveTravel | undefined) => {
+    const login = (userData: User, activeTravel?: ActiveTravel, messages?: DeclineMessage[]) => {
         setUser(userData);
         if (userData.active === false) {
-            navigate('pendingApproval');
+            navigate('pendingApproval', { messages: [{
+                message: 'Mande mais fotos do carro',
+            },{
+                message: 'A foto da CNH está ilegível',
+            }] });
             return;
         }
         if (activeTravel) {
@@ -86,7 +94,7 @@ export const UserProvider = ({ children }: {
     };
 
     return <UserContext.Provider value={{ user, login, logout }}>
-            {children}
+        {children}
     </UserContext.Provider>;
 
 };

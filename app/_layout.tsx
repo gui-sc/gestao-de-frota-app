@@ -24,6 +24,7 @@ import ChatTabScreenPassenger from './passenger/chatTab';
 import DriverProfileScreen from './driver/profile';
 import UserProfileScreen from './passenger/profile';
 import TripListScreen from './driver/trips';
+import UpdateDriverScreen from './updateDriverRegistration';
 const RootStack = createStackNavigator<RootStackParamList>();
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
@@ -64,6 +65,7 @@ export default function RootLayout() {
             <RootStack.Screen name="driverRegistration" options={{ headerShown: false }} component={DriverRegistrationScreen} />
             <RootStack.Screen name="passengerRegistration" options={{ headerShown: false }} component={PassengerRegistrationScreen} />
             <RootStack.Screen name="pendingApproval" options={{ headerShown: false }} component={PendingApprovalScreen} />
+            <RootStack.Screen name="updateDriverRegistration" options={{ headerShown: false }} component={UpdateDriverScreen} />
           </RootStack.Navigator>
           <Toast />
         </UserProvider>
