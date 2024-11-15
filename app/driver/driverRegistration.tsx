@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, TouchableOpacity, Text, Image, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import CarBrandPicker from '../components/CarBrandModelSelector';
-import { createDriver, createVehicle } from '../api/routes';
-import { maskToDate } from '../utils/mask';
-import toastHelper from '../utils/toast';
-import { navigate } from './rootNavigation';
+import CarBrandPicker from '../../components/CarBrandModelSelector';
+import { createDriver, createVehicle } from '../../api/routes';
+import { maskToDate } from '../../utils/mask';
+import toastHelper from '../../utils/toast';
+import { navigate } from '../../utils/rootNavigation';
 
 export default function DriverRegistrationScreen() {
     const [step, setStep] = useState(1);

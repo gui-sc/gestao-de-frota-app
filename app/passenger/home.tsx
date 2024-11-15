@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { useNavigation } from '@react-navigation/native';
 import BottomTabs from '../../components/BottomTabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { navigate } from '../rootNavigation';
+import { navigate } from '../../utils/rootNavigation';
 
 export default function HomeScreen() {
   const { user } = useContext(UserContext);

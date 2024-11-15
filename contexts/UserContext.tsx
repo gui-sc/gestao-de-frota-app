@@ -1,8 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { createContext, useState } from 'react';
-import { RouteList } from '../utils/stackParamRouteList';
-import { navigate } from '../app/rootNavigation';
+import { navigate } from '../utils/rootNavigation';
 type User = {
     id: number;
     type: 'passenger' | 'driver';

@@ -7,7 +7,7 @@ import { getChatByDriver } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
 import { UserContext } from '../../contexts/UserContext';
 import { useNavigation } from '@react-navigation/native';
-import { navigate } from '../rootNavigation';
+import { navigate } from '../../utils/rootNavigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import BottomTabs from '../../components/BottomTabs';
 

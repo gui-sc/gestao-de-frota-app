@@ -1,13 +1,11 @@
 import { Trip } from '@/types/trip';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { View, Text, Button, Modal, StyleSheet, Image } from 'react-native';
-import { RouteList } from '../utils/stackParamRouteList';
 import { API_KEY } from '../constants/Env';
 import { acceptTravel } from '../api/routes';
 import { UserContext } from '../contexts/UserContext';
 import toastHelper from '../utils/toast';
-import { useNavigation } from '@react-navigation/native';
-import { navigate } from '../app/rootNavigation';
+import { navigate } from '../utils/rootNavigation';
 
 const TripDetailsModal = ({
     visible,
@@ -23,8 +21,6 @@ const TripDetailsModal = ({
     } | null,
     onClose: () => void
 }) => {
-    const navigation = useNavigation<RouteList>();
-
     const { user } = useContext(UserContext);
     if (!trip || !user || !location) return null;
 

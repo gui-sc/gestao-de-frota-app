@@ -2,11 +2,11 @@ import React, { useContext, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import dayjs from 'dayjs';
-import { getMessages, readMessages, sendMessage } from '../api/routes';
-import { UserContext } from '../contexts/UserContext';
-import LoadingIndicator from '../components/Loading';
-import toastHelper from '../utils/toast';
-import { navigate } from './rootNavigation';
+import { getMessages, readMessages, sendMessage } from '../../api/routes';
+import { UserContext } from '../../contexts/UserContext';
+import LoadingIndicator from '../../components/Loading';
+import toastHelper from '../../utils/toast';
+import { navigate } from '../../utils/rootNavigation';
 
 interface Message {
     id: string;

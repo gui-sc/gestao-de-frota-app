@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { RouteList } from '../utils/stackParamRouteList';
-import { navigate } from '../app/rootNavigation';
+import { navigate } from '../utils/rootNavigation';
 
 interface TabItem {
   label: string;
