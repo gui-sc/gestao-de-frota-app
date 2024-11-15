@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 // import { fetchDriverAndVehicleData, updateVehicleData } from '../api/routes';
-import toastHelper from '../utils/toast';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import CarBrandPicker from '../components/CarBrandModelSelector';
+import toastHelper from '../../utils/toast';
+import CarBrandPicker from '../../components/CarBrandModelSelector';
 
 type UpdateDriverScreenProps = RouteProp<{
     updateDriverRegistration: {

@@ -8,9 +8,9 @@ import {
     Modal,
     TouchableOpacity,
 } from 'react-native';
-import { UserContext } from '../contexts/UserContext';
-import { navigate } from './rootNavigation';
+import { UserContext } from '../../contexts/UserContext';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import { navigate } from '../../utils/rootNavigation';
 
 export type DeclineMessage = {
     message: string;

@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, TouchableOpacity, Text, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { createUser } from '../api/routes';
-import { maskToDate } from '../utils/mask';
-import toastHelper from '../utils/toast';
-import { navigate } from './rootNavigation';
+import { createUser } from '../../api/routes';
+import { navigate } from '../../utils/rootNavigation';
+import toastHelper from '../../utils/toast';
+import { maskToDate } from '../../utils/mask';
 
 export default function PassengerRegistrationScreen() {
 

@@ -3,16 +3,16 @@ import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Alert, Image, A
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { API_KEY } from '../constants/Env';
 import MapViewDirections from 'react-native-maps-directions';
-import { updateLocation, getLocation, getTripDriver, initTravel, finishTravel, getChatByTravel, cancelTravel, getUnreadMessagesCount } from '../api/routes';
-import LoadingIndicator from '../components/Loading';
-import { RouteList } from '../utils/stackParamRouteList';
 import Icon from 'react-native-vector-icons/AntDesign';
-import toastHelper from '../utils/toast';
-import { UserContext } from '../contexts/UserContext';
-import { navigate } from './rootNavigation';
-import UnreadBadge from '../components/UnreadBadge';
+import { UserContext } from '../../contexts/UserContext';
+import { RouteList } from '../../utils/stackParamRouteList';
+import { cancelTravel, finishTravel, getChatByTravel, getLocation, getTripDriver, getUnreadMessagesCount, initTravel, updateLocation } from '../../api/routes';
+import toastHelper from '../../utils/toast';
+import { navigate } from '../../utils/rootNavigation';
+import LoadingIndicator from '../../components/Loading';
+import UnreadBadge from '../../components/UnreadBadge';
+import { API_KEY } from '../../constants/Env';
 
 type PendingTripProp = RouteProp<{
     pendingTrip: {

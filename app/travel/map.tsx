@@ -4,14 +4,14 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import MapViewDirections from 'react-native-maps-directions';
-import { UserContext } from '../contexts/UserContext';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { API_KEY } from '../constants/Env';
-import { finishTravel, initTravel } from '../api/routes';
-import toastHelper from '../utils/toast';
-import LoadingIndicator from '../components/Loading';
-import { RouteList } from '../utils/stackParamRouteList';
-import { navigate } from './rootNavigation';
+import { UserContext } from '../../contexts/UserContext';
+import { RouteList } from '../../utils/stackParamRouteList';
+import { finishTravel, initTravel } from '../../api/routes';
+import toastHelper from '../../utils/toast';
+import LoadingIndicator from '../../components/Loading';
+import { navigate } from '../../utils/rootNavigation';
+import { API_KEY } from '../../constants/Env';
 
 type MapScreenRouteProp = RouteProp<{
     map: {

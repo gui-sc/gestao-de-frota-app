@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Text, View, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
 import { maskToCpf } from '@/utils/mask';
-import toast from '../../utils/toast';
 import InputPicture from '../../components/InputPicture';
 import dayjs from 'dayjs';
 import { updateAvatar } from '../../api/routes';

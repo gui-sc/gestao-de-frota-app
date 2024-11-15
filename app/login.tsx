@@ -4,12 +4,12 @@ import { UserContext } from '../contexts/UserContext';
 import LoadingIndicator from '../components/Loading';
 import toastHelper from '@/utils/toast';
 import { loginApp } from '../api/routes';
-import { navigate } from './rootNavigation';
+import { navigate } from '../utils/rootNavigation';
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('guilhermemotorista1@gmail.com');
+  const [password, setPassword] = useState('1234567');
   const [modalVisible, setModalVisible] = useState(false);
 
   const { login, user } = useContext(UserContext);
