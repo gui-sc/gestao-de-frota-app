@@ -99,18 +99,20 @@ const PendingTrip = () => {
                 setUnreadCountMessages(res.unreadMessagesCount)
             }).catch((err) => {
                 console.error('Erro ao buscar mensagens não lidas:', err);
-                toastHelper.error('Erro ao buscar mensagens não lidas', 'Tente novamente mais tarde');
+                // toastHelper.error('Erro ao buscar mensagens não lidas', 'Tente novamente mais tarde');
             })
         }
     }, [chatId]);
 
     useEffect(() => {
         getChatByTravel(tripId).then((chat) => {
-            setChatId(chat.id);
-            console.log('Chat:', chat.id);
+            if (chat) {
+                setChatId(chat.id);
+                console.log('Chat:', chat.id);
+            }
         }).catch((err) => {
             console.error('Erro ao buscar chat:', err);
-            toastHelper.error('Erro ao buscar chat', 'Tente novamente mais tarde');
+            // toastHelper.error('Erro ao buscar chat', 'Tente novamente mais tarde');
         });
         getCurrentLocation();
         const interval = setInterval(() => {
@@ -292,14 +294,16 @@ const PendingTrip = () => {
                         passengerName: otherUserInfo.name,
                         passengerPhoto: otherUserInfo.avatar,
                     })} style={styles.chatContainer}>
-                        <Icon name="message1" size={24} color="#fff" />  {/* Ícone de chat */}
-                        {unreadCountMessages > 0 && (
-                            <View style={styles.badgeContainer}>
-                                <Text style={styles.badgeText}>
-                                    <UnreadBadge count={unreadCountMessages} />
-                                </Text>
-                            </View>
-                        )}
+                        <Text>
+                            <Icon name="message1" size={24} color="#fff" />
+                            {unreadCountMessages > 0 && (
+                                <View style={styles.badgeContainer}>
+                                    <Text style={styles.badgeText}>
+                                        <UnreadBadge count={unreadCountMessages} />
+                                    </Text>
+                                </View>
+                            )}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             )}

@@ -59,10 +59,10 @@ export const UserProvider = ({ children }: {
 }) => {
     const [user, setUser] = useState<User | null>(null);
     // Função para logar o  usuário
-    const login = (userData: User, activeTravel?: ActiveTravel, messages?: DeclineMessage[]) => {
+    const login = (userData: User, activeTravel?: ActiveTravel, messages: DeclineMessage[] = []) => {
         setUser(userData);
         if (userData.active === false) {
-            navigate('pendingApproval', { messages });
+            navigate('pendingApproval', { driverId: userData.id, messages });
             return;
         }
         if (activeTravel) {

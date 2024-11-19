@@ -1,5 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import { DeclineMessage } from "../app/pendingApproval";
+import { DeclineMessage } from "../app/driver/pendingApproval";
 
 export type RootStackParamList = {
     login: undefined;
@@ -60,6 +60,7 @@ export type RootStackParamList = {
     driverRegistration: undefined;
     passengerRegistration: undefined;
     pendingApproval: {
+        driverId: number,
         messages?: DeclineMessage[];
     };
 };

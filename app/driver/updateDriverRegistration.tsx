@@ -173,7 +173,7 @@ export default function UpdateDriverScreen() {
         }
     };
 
-    if (loading) return <LoadingIndicator />;
+    if (loading || !driverData) return <LoadingIndicator />;
 
     return (
         <SafeAreaView style={styles.container}>

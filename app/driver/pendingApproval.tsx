@@ -18,6 +18,7 @@ export type DeclineMessage = {
 
 type PendingApprovalScreenProps = RouteProp<{
     pendingApproval: {
+        driverId: number,
         messages?: DeclineMessage[];
     };
 }>
@@ -26,7 +27,7 @@ export default function PendingApprovalScreen() {
     const { user, logout } = useContext(UserContext);
 
     const route = useRoute<PendingApprovalScreenProps>();
-    const { messages } = route.params;
+    const { driverId, messages } = route.params;
     const [isMainModalVisible, setMainModalVisible] = useState(false);
     const [isDetailModalVisible, setDetailModalVisible] = useState(false);
     const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -62,7 +63,7 @@ export default function PendingApprovalScreen() {
 
     const handleUpdateRegister = () => {
         navigate('updateDriverRegistration', {
-            driverId: 8
+            driverId
         });
     }
 

@@ -62,7 +62,7 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <View style={styles.item}>
               <Text style={styles.itemText}>{item.destination}</Text>
-              <Text style={styles.itemText}>
+              <Text style={styles.itemTextHour}>
                 {dayjs(item.finalTime).format('DD/MM/YYYY')} às {dayjs(item.finalTime).format('HH:mm')}
               </Text>
             </View>
@@ -76,8 +76,8 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <View style={styles.item}>
               <Text style={styles.itemText}>{item.description}</Text>
-              <Text style={styles.itemText}>
-                {dayjs(item.date).format('DD/MM/YYYY')} às {dayjs(item.date).format('HH:mm')}
+              <Text style={styles.itemTextHour}>
+                {dayjs(item.date).format('DD/MM/YYYY')}
               </Text>
             </View>
           )}
@@ -113,4 +113,8 @@ const styles = StyleSheet.create({
   itemText: {
     color: '#fff',
   },
+  itemTextHour: {
+    color: '#fff',
+    textAlign: 'right',
+  }
 });
