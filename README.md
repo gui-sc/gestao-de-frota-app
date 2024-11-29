@@ -1,5 +1,5 @@
 This is an app for managing fleets and travel applications, built with React Native.
-This project is part of three projects that are part of the same system, the other two are the [API](https://github.com/gui-sc/gestao-de-frota-app.git) and the [Web App](https://github.com/Alyssonzin/gestao-frota-web).
+This project is part of three projects that are part of the same system, the other two are the [API](https://github.com/gui-sc/api-gestao-de-frota) and the [Web App](https://github.com/Alyssonzin/gestao-frota-web).
 
 ## Features
 
