@@ -3,11 +3,9 @@ This project is part of three projects that are part of the same system, the oth
 
 ## Features
 
-- [x] Google Bucket Storage
-- [x] Google Maps
-- [x] Typescript
-- [x] Expo
-- [x] React Native
+- [x] Important Dates remember
+- [x] Chat with the driver
+- [x] Vehicle management
 
 
 ## Tech Stack
