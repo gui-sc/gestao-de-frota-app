@@ -61,7 +61,7 @@ export type RootStackParamList = {
     passengerRegistration: undefined;
     pendingApproval: {
         driverId: number,
-        messages?: DeclineMessage[];
+        messages: DeclineMessage[];
     };
 };
 

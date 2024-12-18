@@ -159,7 +159,7 @@ export default function UpdateDriverScreen() {
             console.log('vehicleId', vehicleId)
             await updateVehicle(vehicleId, formData).then(res => {
                 console.log('res', res)
-                navigate('pendingApproval', { driverId });
+                navigate('pendingApproval', { driverId, messages: [] });
             }).catch(error => {
                 console.log('error', error);
                 toastHelper.error('Erro ao atualizar cadastro', 'Tente novamente mais tarde.');

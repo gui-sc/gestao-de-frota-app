@@ -19,7 +19,7 @@ export type DeclineMessage = {
 type PendingApprovalScreenProps = RouteProp<{
     pendingApproval: {
         driverId: number,
-        messages?: DeclineMessage[];
+        messages: DeclineMessage[];
     };
 }>
 
@@ -44,13 +44,13 @@ export default function PendingApprovalScreen() {
 
     useEffect(() => {
         console.log('messages', messages);
-        if (messages?.length) {
+        if (messages.length > 0) {
             openMainModal();
         }
     }, [messages]);
 
     const handleNextMessage = () => {
-        if (currentMessageIndex < (messages?.length ?? 1) - 1) {
+        if (currentMessageIndex < (messages.length > 0 ? messages.length : 1) - 1) {
             setCurrentMessageIndex((prevIndex) => prevIndex + 1);
         }
     };
@@ -76,7 +76,7 @@ export default function PendingApprovalScreen() {
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.title}>Cadastro Pendente</Text>
-                {messages?.length ? (
+                {messages.length > 0 ? (
                     <Text style={styles.message}>
                         Olá, {user.name}! Seu cadastro foi RECUSADO. Clique no botão abaixo para ver os detalhes.
                     </Text>
@@ -85,7 +85,7 @@ export default function PendingApprovalScreen() {
                         Olá, {user.name}! Seu cadastro está em análise. Entraremos em contato assim que ele for aprovado.
                     </Text>
                 )}
-                {messages?.length &&
+                {messages.length > 0 &&
                     <View style={styles.containerButtons}>
                         <TouchableOpacity style={styles.button} onPress={openDetailModal}>
                             <Text style={styles.buttonText}>Ver Detalhes</Text>
@@ -135,7 +135,7 @@ export default function PendingApprovalScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={handleNextMessage}
-                                disabled={currentMessageIndex === (messages?.length ?? 1) - 1}
+                                disabled={currentMessageIndex === (messages.length > 0 ? messages.length : 1) - 1}
                             >
                                 <Text style={styles.buttonText}>Próxima</Text>
                             </TouchableOpacity>
