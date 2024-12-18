@@ -9,13 +9,8 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
       "android": {
-        "buildType": "apk",
-        "autoIncrement": true
-      },
-      "env": {
-        "API_KEY": ""
+        "buildType": "apk"
       }
     },
     "production": {

@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Alert, StyleSheet, View, Text, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, TextInput, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { Alert, StyleSheet, View, Text, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, TextInput, FlatList, TouchableWithoutFeedback, Keyboard, Dimensions } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import MapViewDirections from 'react-native-maps-directions';
 import { UserContext } from '../../contexts/UserContext';
 import { RouteList } from '../../utils/stackParamRouteList';
-import { API_KEY } from '../../constants/Env';
 import toastHelper from '../../utils/toast';
 import { navigate } from '../../utils/rootNavigation';
 import { createTravel } from '../../api/routes';
 import LoadingIndicator from '../../components/Loading';
+import { API_KEY } from '../../constants/Env';
+
+const { width, height } = Dimensions.get('window')
 
 const ChooseDestination = () => {
     const { user } = useContext(UserContext);
@@ -52,6 +54,7 @@ const ChooseDestination = () => {
             let response = await Location.reverseGeocodeAsync({ latitude, longitude });
             for (let item of response) {
                 let address = `${item.street}, ${item.city}`;
+                console.log('Address:', address);
                 setDisplayCurrentAddress(address);
             }
         }
@@ -60,17 +63,25 @@ const ChooseDestination = () => {
     // Função para integrar com a API do Google e buscar sugestões
     const fetchSuggestions = async (input: string) => {
         if (!input) return;
-        const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${API_KEY}&location=${location?.latitude},${location?.longitude}&radius=2000`;
+        if (!location) {
+            console.error("Localização não definida");
+            return;
+        }
         try {
+            const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${API_KEY}&location=${location.latitude},${location.longitude}&radius=2000`;
             const response = await fetch(url);
+            if (!response.ok) throw new Error("Erro ao buscar sugestões");
             const data = await response.json();
-            if (data.status === 'OK') {
+            if (data.status === "OK") {
                 setSuggestions(data.predictions);
+            } else {
+                console.error("Google API error:", data.error_message);
             }
         } catch (error) {
-            console.error('Erro ao buscar sugestões:', error);
+            console.error("Erro ao buscar sugestões:", error);
         }
     };
+
 
     // Função ao selecionar um destino da lista
     const handleSelectSuggestion = async (placeId: string) => {
@@ -91,14 +102,14 @@ const ChooseDestination = () => {
         if (!location || !destinationCoordinates) return null;
 
         const R = 6371e3; // metres
-        const φ1 = location.latitude * Math.PI / 180; // φ, λ in radians
-        const φ2 = destinationCoordinates.latitude * Math.PI / 180;
-        const Δφ = (destinationCoordinates.latitude - location.latitude) * Math.PI / 180;
-        const Δλ = (destinationCoordinates.longitude - location.longitude) * Math.PI / 180;
+        const latitudeInRadians = location.latitude * Math.PI / 180; // φ, λ in radians
+        const convertedLatitude = destinationCoordinates.latitude * Math.PI / 180;
+        const deltaLatitude = (destinationCoordinates.latitude - location.latitude) * Math.PI / 180;
+        const deltaLongitude = (destinationCoordinates.longitude - location.longitude) * Math.PI / 180;
 
-        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const a = Math.sin(deltaLatitude / 2) * Math.sin(deltaLatitude / 2) +
+            Math.cos(latitudeInRadians) * Math.cos(convertedLatitude) *
+            Math.sin(deltaLongitude / 2) * Math.sin(deltaLongitude / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return R * c; // in metres
@@ -125,7 +136,7 @@ const ChooseDestination = () => {
             actual_latitude_passenger: location.latitude,
             actual_longitude_passenger: location.longitude,
             passenger: user.id,
-            value: calculateDistance()! * 0.00001 + taxiValue,
+            value: calculateDistance() ? calculateDistance()! * 0.00001 + taxiValue : 0,
             destination,
         }).then((res) => {
             toastHelper.success('Sucesso', 'Viagem solicitada com sucesso!');
@@ -199,6 +210,7 @@ const ChooseDestination = () => {
                     {suggestions.length > 0 && (
                         <FlatList
                             data={suggestions}
+                            initialNumToRender={5}
                             keyExtractor={(item) => item.place_id}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
@@ -225,7 +237,9 @@ const ChooseDestination = () => {
                                 latitudeDelta: 0.05,
                                 longitudeDelta: 0.05,
                             }}
-                            loadingEnabled={true}
+                            provider={PROVIDER_GOOGLE}
+                            loadingEnabled
+                            onMapReady={() => console.log('Map is ready!')}
                         >
                             {/* Marcador da localização atual */}
                             <Marker coordinate={location} title="Sua localização" description={displayCurrentAddress} />
@@ -236,13 +250,16 @@ const ChooseDestination = () => {
                                     title="Destino"
                                     description={destination} />
                             )}
-                            <MapViewDirections
-                                origin={location}
-                                destination={destinationCoordinates || location}
-                                strokeWidth={4}
-                                strokeColor='#111111'
-                                apikey={API_KEY}
-                            />
+                            {location && destinationCoordinates && (
+                                <MapViewDirections
+                                    origin={location}
+                                    destination={destinationCoordinates}
+                                    strokeWidth={4}
+                                    strokeColor="#111111"
+                                    apikey={API_KEY}
+                                />
+                            )}
+
                         </MapView>
                     )}
                     {destinationCoordinates &&
@@ -254,7 +271,7 @@ const ChooseDestination = () => {
                                     {'Solicitar Viagem'}
                                 </Text>
                                 <Text style={styles.buttonText}>
-                                    {`Valor: R$ ${(calculateDistance()! * 0.0001 + 2.5).toFixed(2)}`}
+                                    {`Valor: R$ ${(calculateDistance() ? (calculateDistance()! * 0.0001 + 2.5) : 0).toFixed(2)}`}
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -331,6 +348,8 @@ const styles = StyleSheet.create({
     },
     map: {
         flex: 1,
+        width: width,
+        height: height,
         marginTop: 80, // Ajustar o mapa para não sobrepor os campos
     },
 });
