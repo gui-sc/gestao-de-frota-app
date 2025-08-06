@@ -26,7 +26,7 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": "YOUR_API_KEY"
+          "apiKey": "AIzaSyB2Xv597XZJqet_IEaQOb7wnnKgdgfGbDo"
         }
       },
       "package": "com.guisc.gestaofrota"
